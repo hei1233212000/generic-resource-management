@@ -1,10 +1,10 @@
-package poc.genericrecourcemanagement;
+package poc.genericresourcemanagement;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class GenericRecourceManagementApplicationTests {
+class GenericResourceManagementApplicationTests {
 
     @Test
     void contextLoads() {
