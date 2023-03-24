@@ -1,0 +1,62 @@
+databaseChangeLog:
+  - changeSet:
+      id: v1
+      author: harry
+      changes:
+        - createTable:
+            tableName: RESOURCE
+            columns:
+              - column:
+                  name: TYPE
+                  type: varchar(50)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: ID
+                  type: varchar(255)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: VERSION
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: CONTENT
+                  type: JSON
+                  constraints:
+                    nullable: false
+              - column:
+                  name: STATUS
+                  type: varchar(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: CREATED_BY
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: CREATED_TIMESTAMP
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: UPDATED_BY
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: UPDATED_TIMESTAMP
+                  type: datetime
+                  constraints:
+                    nullable: false
+        - createIndex:
+            columns:
+              - column:
+                  name: TYPE
+            indexName: IDX_RESOURCE_TYPE
+            tableName: RESOURCE
+            unique: true
