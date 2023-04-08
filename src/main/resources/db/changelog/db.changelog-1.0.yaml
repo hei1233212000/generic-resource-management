@@ -59,4 +59,3 @@ databaseChangeLog:
                   name: TYPE
             indexName: IDX_RESOURCE_TYPE
             tableName: RESOURCE
-            unique: true

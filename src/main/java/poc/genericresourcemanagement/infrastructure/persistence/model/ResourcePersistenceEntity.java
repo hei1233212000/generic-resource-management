@@ -1,5 +1,6 @@
 package poc.genericresourcemanagement.infrastructure.persistence.model;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,7 +27,7 @@ public class ResourcePersistenceEntity {
     private String id;
 
     @Column
-    private String content;
+    private JsonNode content;
 
     @Column
     private ResourceDomainModel.ResourceStatus status;

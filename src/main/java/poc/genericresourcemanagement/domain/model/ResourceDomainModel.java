@@ -1,5 +1,6 @@
 package poc.genericresourcemanagement.domain.model;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
@@ -8,7 +9,7 @@ import java.time.LocalDateTime;
 public record ResourceDomainModel(
         ResourceType type,
         String id,
-        String content,
+        JsonNode content,
         ResourceDomainModel.ResourceStatus status,
         Long version,
         String createdBy,
