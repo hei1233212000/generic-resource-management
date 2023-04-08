@@ -41,9 +41,11 @@ dependencies {
     testImplementation(platform("io.cucumber:cucumber-bom:7.11.2"))
 
     testImplementation("io.cucumber:cucumber-java8")
+    testImplementation("io.cucumber:cucumber-spring")
     testImplementation("io.cucumber:cucumber-junit-platform-engine")
     testImplementation("org.junit.platform:junit-platform-suite")
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("io.rest-assured:rest-assured:5.3.0")
 }
 
 tasks.withType<Test> {
