@@ -6,7 +6,7 @@ import org.springframework.test.context.ActiveProfiles;
 import poc.genericresourcemanagement.GenericResourceManagementApplication;
 
 @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT,
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
         classes = {GenericResourceManagementApplication.class}
 )
 @ActiveProfiles("cucumber")

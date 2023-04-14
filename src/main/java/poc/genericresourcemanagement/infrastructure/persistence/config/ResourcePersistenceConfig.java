@@ -9,8 +9,8 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.r2dbc.convert.R2dbcCustomConversions;
 import org.springframework.data.r2dbc.dialect.DialectResolver;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
-import poc.genericresourcemanagement.infrastructure.persistence.model.JsonNode2StringConverter;
-import poc.genericresourcemanagement.infrastructure.persistence.model.String2JsonNodeConverter;
+import poc.genericresourcemanagement.infrastructure.persistence.model.converter.JsonNode2StringConverter;
+import poc.genericresourcemanagement.infrastructure.persistence.model.converter.String2JsonNodeConverter;
 
 import java.util.List;
 

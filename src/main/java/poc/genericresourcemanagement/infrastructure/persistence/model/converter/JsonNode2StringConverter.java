@@ -1,4 +1,4 @@
-package poc.genericresourcemanagement.infrastructure.persistence.model;
+package poc.genericresourcemanagement.infrastructure.persistence.model.converter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

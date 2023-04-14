@@ -1,0 +1,4 @@
+logging:
+  level:
+    io.r2dbc.h2.client.SessionClient: DEBUG
+    liquibase.executor: DEBUG
