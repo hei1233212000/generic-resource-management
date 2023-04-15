@@ -7,7 +7,6 @@ import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
 @Builder
 public record CreateResourceRequest(
         ResourceDomainModel.ResourceType type,
-        String id,
         JsonNode content,
         String createdBy
 ) {

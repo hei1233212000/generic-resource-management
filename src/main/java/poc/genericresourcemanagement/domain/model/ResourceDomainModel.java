@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Builder
 public record ResourceDomainModel(
         ResourceType type,
-        String id,
+        Long id,
         JsonNode content,
         ResourceDomainModel.ResourceStatus status,
         Long version,

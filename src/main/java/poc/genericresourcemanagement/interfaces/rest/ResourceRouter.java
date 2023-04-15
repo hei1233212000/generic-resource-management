@@ -65,7 +65,7 @@ public class ResourceRouter {
         final Mono<ResourceDto> resource =
                 resourceService.findResourceDomainModelById(
                                 ResourceDomainModel.ResourceType.valueOf(request.pathVariable("type")),
-                                request.pathVariable("id")
+                                Long.parseLong(request.pathVariable("id"))
                         )
                         .map(this::convert);
         return ServerResponse.ok()
@@ -78,7 +78,6 @@ public class ResourceRouter {
         final Mono<ResourceDto> resource = request.bodyToMono(CreateResourceRequestDto.class)
                 .map(r -> CreateResourceRequest.builder()
                         .type(type)
-                        .id(r.id())
                         .content(r.content())
                         .createdBy("user")
                         .build())

@@ -25,7 +25,7 @@ public class ResourceService {
 
     public Mono<ResourceDomainModel> findResourceDomainModelById(
             final ResourceDomainModel.ResourceType type,
-            final String id
+            final long id
     ) {
         return resourceRepository.findByTypeAndId(type, id)
                 .map(this::convert);
@@ -34,9 +34,12 @@ public class ResourceService {
     public Mono<ResourceDomainModel> createResource(
             final CreateResourceRequest createResourceRequest
     ) {
-        final ResourcePersistenceEntity convert = convert(createResourceRequest);
-        return resourceRepository.save(convert)
-                .map(this::convert);
+        return resourceRepository.findUserResourceNextId()
+                .flatMap(newId -> {
+                    final ResourcePersistenceEntity convert = convert(newId, createResourceRequest);
+                    return resourceRepository.save(convert)
+                            .map(this::convert);
+                });
     }
 
     @SneakyThrows
@@ -55,11 +58,11 @@ public class ResourceService {
     }
 
     @SneakyThrows
-    private ResourcePersistenceEntity convert(final CreateResourceRequest createResourceRequest) {
+    private ResourcePersistenceEntity convert(final Long newId, final CreateResourceRequest createResourceRequest) {
         final LocalDateTime currentLocalDateTime = timeGenerator.currentLocalDateTime();
         return ResourcePersistenceEntity.builder()
                 .type(createResourceRequest.type())
-                .id(createResourceRequest.id())
+                .id(newId)
                 .content(createResourceRequest.content())
                 .status(ResourceDomainModel.ResourceStatus.PENDING_APPROVAL)
                 .createdBy(createResourceRequest.createdBy())

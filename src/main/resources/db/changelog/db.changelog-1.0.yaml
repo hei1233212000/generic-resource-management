@@ -14,7 +14,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: ID
-                  type: varchar(255)
+                  type: bigint
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -59,3 +59,9 @@ databaseChangeLog:
                   name: TYPE
             indexName: IDX_RESOURCE_TYPE
             tableName: RESOURCE
+        - createSequence:
+            sequenceName: USER_REQUEST_ID_SEQ
+            cycle: true
+            minValue: 1
+            incrementBy: 1
+            ordered: true
