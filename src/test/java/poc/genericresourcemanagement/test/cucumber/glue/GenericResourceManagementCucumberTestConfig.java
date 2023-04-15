@@ -6,7 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 import poc.genericresourcemanagement.GenericResourceManagementApplication;
-import poc.genericresourcemanagement.application.service.TimeGenerator;
+import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.test.cucumber.service.ManualTimeGenerator;
 
 @SpringBootTest(

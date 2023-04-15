@@ -10,7 +10,7 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import poc.genericresourcemanagement.application.model.CreateResourceRequest;
-import poc.genericresourcemanagement.application.service.ResourceService;
+import poc.genericresourcemanagement.application.service.resource.ResourceService;
 import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
 import poc.genericresourcemanagement.interfaces.model.CreateResourceRequestDto;
 import poc.genericresourcemanagement.interfaces.model.ResourceDto;

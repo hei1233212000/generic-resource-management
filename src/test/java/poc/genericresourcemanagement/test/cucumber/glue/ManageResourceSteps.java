@@ -47,7 +47,8 @@ public class ManageResourceSteps implements En {
                     .isTrue();
             assertThat(jsonNode).isEmpty();
         });
-        Then("the resource request is successfully processed", () -> response.then().statusCode(201));
+        Then("the resource request is (successfully processed)(failed) with http status code {int}",
+                (Integer expectedHttpStatusCode) -> response.then().statusCode(expectedHttpStatusCode));
         Then("the {resourceType} response of with id {string} should contain the base info:",
                 (ResourceDomainModel.ResourceType resourceType, String requestId, DataTable dataTable) -> {
                     response = when().get("/resources/{resourceType}/{requestId}", resourceType, requestId);

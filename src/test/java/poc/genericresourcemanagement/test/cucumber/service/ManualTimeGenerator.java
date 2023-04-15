@@ -1,6 +1,6 @@
 package poc.genericresourcemanagement.test.cucumber.service;
 
-import poc.genericresourcemanagement.application.service.TimeGenerator;
+import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

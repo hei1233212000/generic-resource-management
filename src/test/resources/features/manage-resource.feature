@@ -19,7 +19,7 @@ Feature: Manage resource
       }
     }
     """
-    Then the resource request is successfully processed
+    Then the resource request is successfully processed with http status code 201
     And the USER response of with id "1" should contain the base info:
       | type        | USER                    |
       | id          | 1                       |

@@ -1,8 +1,9 @@
-package poc.genericresourcemanagement.application.service;
+package poc.genericresourcemanagement.application.service.resource;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import poc.genericresourcemanagement.application.model.CreateResourceRequest;
+import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
 import poc.genericresourcemanagement.infrastructure.persistence.model.ResourcePersistenceEntity;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRepository;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 public class ResourceService {
     private final TimeGenerator timeGenerator;
     private final ResourceRepository resourceRepository;
+    private final ResourceIdGeneratorService resourceIdGeneratorService;
 
     public Flux<ResourceDomainModel> findResourceDomainModelsByType(
             final ResourceDomainModel.ResourceType type
@@ -34,7 +36,7 @@ public class ResourceService {
     public Mono<ResourceDomainModel> createResource(
             final CreateResourceRequest createResourceRequest
     ) {
-        return resourceRepository.findUserResourceNextId()
+        return resourceIdGeneratorService.generateResourceId(createResourceRequest.type())
                 .flatMap(newId -> {
                     final ResourcePersistenceEntity convert = convert(newId, createResourceRequest);
                     return resourceRepository.save(convert)
