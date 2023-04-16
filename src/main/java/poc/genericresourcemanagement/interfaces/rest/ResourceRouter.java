@@ -24,7 +24,9 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 
 public class ResourceRouter {
     @Bean
-    RouterFunction<ServerResponse> resourceRoutes(final ResourceService resourceService) {
+    RouterFunction<ServerResponse> resourceRoutes(
+            final ResourceService resourceService
+    ) {
         return RouterFunctions.route()
                 .GET("/resources/{type}/{id}", accept(MediaType.APPLICATION_JSON),
                         request -> getResource(request, resourceService))

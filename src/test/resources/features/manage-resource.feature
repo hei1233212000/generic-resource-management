@@ -30,3 +30,17 @@ Feature: Manage resource
     And the content of the resource response should be:
       | name | Peter |
       | age  | 18    |
+
+  Scenario: should have validation error if user age is not provided
+    Given there is no resource exist
+    When I fire the create USER resource request as
+    """
+    {
+      "content": {
+        "name": "Peter"
+      }
+    }
+    """
+    Then the resource request is failed with http status code 400
+    And we got the error messages:
+      | missing 'age' |

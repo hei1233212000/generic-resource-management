@@ -3,17 +3,20 @@ package poc.genericresourcemanagement.application.config;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
 import poc.genericresourcemanagement.application.service.common.DefaultTimeGenerator;
+import poc.genericresourcemanagement.application.service.common.TimeGenerator;
+import poc.genericresourcemanagement.application.service.resource.ResourceCreationValidationService;
 import poc.genericresourcemanagement.application.service.resource.ResourceIdGeneratorService;
 import poc.genericresourcemanagement.application.service.resource.ResourceService;
-import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.application.service.resource.id.ResourceIdGenerator;
-import poc.genericresourcemanagement.application.service.resource.id.UserResourceIdGenerator;
+import poc.genericresourcemanagement.application.service.resource.validation.ResourceCreationValidator;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRepository;
 
 import java.util.List;
 
 @Log4j2
+@Import({UserResourceApplicationConfig.class})
 public class ResourceApplicationConfig {
     @Bean
     @ConditionalOnMissingBean
@@ -26,9 +29,12 @@ public class ResourceApplicationConfig {
     ResourceService resourceService(
             final TimeGenerator timeGenerator,
             final ResourceRepository resourceRepository,
-            final ResourceIdGeneratorService resourceIdGeneratorService
+            final ResourceIdGeneratorService resourceIdGeneratorService,
+            final ResourceCreationValidationService resourceCreationValidationService
     ) {
-        return new ResourceService(timeGenerator, resourceRepository, resourceIdGeneratorService);
+        return new ResourceService(
+                timeGenerator, resourceRepository, resourceIdGeneratorService, resourceCreationValidationService
+        );
     }
 
     @Bean
@@ -39,9 +45,9 @@ public class ResourceApplicationConfig {
     }
 
     @Bean
-    UserResourceIdGenerator userResourceIdGenerator(
-            final ResourceRepository resourceRepository
+    ResourceCreationValidationService resourceCreationValidationService(
+            final List<ResourceCreationValidator> validators
     ) {
-        return new UserResourceIdGenerator(resourceRepository);
+        return new ResourceCreationValidationService(validators);
     }
 }

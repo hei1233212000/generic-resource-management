@@ -17,6 +17,7 @@ public class ResourceService {
     private final TimeGenerator timeGenerator;
     private final ResourceRepository resourceRepository;
     private final ResourceIdGeneratorService resourceIdGeneratorService;
+    private final ResourceCreationValidationService resourceCreationValidationService;
 
     public Flux<ResourceDomainModel> findResourceDomainModelsByType(
             final ResourceDomainModel.ResourceType type
@@ -36,12 +37,11 @@ public class ResourceService {
     public Mono<ResourceDomainModel> createResource(
             final CreateResourceRequest createResourceRequest
     ) {
+        resourceCreationValidationService.validate(createResourceRequest);
         return resourceIdGeneratorService.generateResourceId(createResourceRequest.type())
-                .flatMap(newId -> {
-                    final ResourcePersistenceEntity convert = convert(newId, createResourceRequest);
-                    return resourceRepository.save(convert)
-                            .map(this::convert);
-                });
+                .map(newId -> convert(newId, createResourceRequest))
+                .flatMap(resourceRepository::save)
+                .map(this::convert);
     }
 
     @SneakyThrows

@@ -7,7 +7,10 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import poc.genericresourcemanagement.test.cucumber.service.ManualTimeGenerator;
+
+import java.util.List;
 
 import static org.apache.logging.log4j.util.Unbox.box;
 
@@ -17,7 +20,8 @@ public class GenericResourceManagementCucumberTestHook implements LambdaGlue {
     public GenericResourceManagementCucumberTestHook(
             @LocalServerPort final int port,
             final ManualTimeGenerator manualTimeGenerator,
-            final R2dbcEntityTemplate r2dbcEntityTemplate
+            final R2dbcEntityTemplate r2dbcEntityTemplate,
+            final List<R2dbcRepository<?, ?>> r2dbcRepositories
     ) {
         Before(0, scenario -> {
             RestAssured.filters(new RequestLoggingFilter(), new ResponseLoggingFilter());
@@ -28,10 +32,18 @@ public class GenericResourceManagementCucumberTestHook implements LambdaGlue {
             manualTimeGenerator.setCurrentLocalDateTime(time);
             log.info("going to set the current time to: {}", time);
 
+            cleanUpDatabase(r2dbcRepositories);
             resetDbSequence(r2dbcEntityTemplate);
         });
 
         After(0, scenario -> RestAssured.reset());
+    }
+
+    private static void cleanUpDatabase(final List<R2dbcRepository<?, ?>> r2dbcRepositories) {
+        r2dbcRepositories.forEach(r2dbcRepository -> {
+            r2dbcRepository.deleteAll().block();
+            log.info("all data are deleted by {}", r2dbcRepository);
+        });
     }
 
     private static void resetDbSequence(final R2dbcEntityTemplate r2dbcEntityTemplate) {

@@ -1,5 +1,6 @@
 package poc.genericresourcemanagement.test.cucumber.glue;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.datatable.DataTable;
@@ -10,6 +11,7 @@ import lombok.extern.log4j.Log4j2;
 import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRepository;
 
+import java.util.List;
 import java.util.Map;
 
 import static io.restassured.RestAssured.given;
@@ -59,6 +61,17 @@ public class ManageResourceSteps implements En {
             final JsonNode responseNode = objectMapper.readTree(response.body().asString());
             final JsonNode actualResult = responseNode.get("content");
             verifyJsonNode(dataTable, actualResult);
+        });
+        Then("we got the error messages:", (DataTable dataTable) -> {
+            final List<String> expectedErrorMessages = dataTable.asList();
+
+            final JsonNode responseNode = objectMapper.readTree(response.body().asString());
+            final List<String> actualErrorMessages = objectMapper.convertValue(
+                    responseNode.get("errorMessages"),
+                    new TypeReference<>() {}
+            );
+
+            assertThat(actualErrorMessages).containsExactlyInAnyOrderElementsOf(expectedErrorMessages);
         });
 
         ParameterType("resourceType", ".*",
