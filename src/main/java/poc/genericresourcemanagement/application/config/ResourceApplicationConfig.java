@@ -4,6 +4,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
+import poc.genericresourcemanagement.application.service.common.BeanValidationService;
 import poc.genericresourcemanagement.application.service.common.DefaultTimeGenerator;
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.application.service.resource.ResourceCreationValidationService;
@@ -46,8 +47,14 @@ public class ResourceApplicationConfig {
 
     @Bean
     ResourceCreationValidationService resourceCreationValidationService(
+            final BeanValidationService beanValidationService,
             final List<ResourceCreationValidator> validators
     ) {
-        return new ResourceCreationValidationService(validators);
+        return new ResourceCreationValidationService(beanValidationService, validators);
+    }
+
+    @Bean
+    BeanValidationService beanValidationService(final jakarta.validation.Validator beanValidator) {
+        return new BeanValidationService(beanValidator);
     }
 }

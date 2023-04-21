@@ -16,7 +16,8 @@ Feature: Manage resource
       "content": {
         "name": "Peter",
         "age": 18
-      }
+      },
+      "reason": "This is a test"
     }
     """
     Then the resource request is successfully processed with http status code 201
@@ -24,6 +25,7 @@ Feature: Manage resource
       | type        | USER                    |
       | id          | 1                       |
       | status      | PENDING_APPROVAL        |
+      | reason      | This is a test          |
       | version     | 0                       |
       | createdTime | 2023-02-03T12:34:56.123 |
       | updatedTime | 2023-02-03T12:34:56.123 |
@@ -45,6 +47,22 @@ Feature: Manage resource
 #      | name | Peter |
 #      | age  | 18    |
 
+  Scenario: should have validation error if reason is not provided
+    Given there is no resource exist
+    When I fire the create USER resource request as
+    """
+    {
+      "content": {
+        "name": "Peter",
+        "age": 18
+      },
+      "reason": ""
+    }
+    """
+    Then the resource request is failed with http status code 400
+    And we got the error messages:
+      | 'reason' must not be blank |
+
   Scenario: should have validation error if user age is not provided
     Given there is no resource exist
     When I fire the create USER resource request as
@@ -52,7 +70,8 @@ Feature: Manage resource
     {
       "content": {
         "name": "Peter"
-      }
+      },
+      "reason": "validation test"
     }
     """
     Then the resource request is failed with http status code 400

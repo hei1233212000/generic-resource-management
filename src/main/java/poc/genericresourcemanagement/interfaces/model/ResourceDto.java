@@ -11,6 +11,7 @@ public record ResourceDto(
         ResourceDomainModel.ResourceType type,
         Long id,
         JsonNode content,
+        String reason,
         ResourceDomainModel.ResourceStatus status,
         Long version,
         String createdBy,

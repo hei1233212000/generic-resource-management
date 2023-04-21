@@ -30,6 +30,9 @@ public class ResourcePersistenceEntity {
     private JsonNode content;
 
     @Column
+    private String reason;
+
+    @Column
     private ResourceDomainModel.ResourceStatus status;
 
     @Version

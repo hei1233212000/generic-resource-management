@@ -34,6 +34,11 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: REASON
+                  type: varchar(1000)
+                  constraints:
+                    nullable: false
+              - column:
                   name: CREATED_BY
                   type: varchar(255)
                   constraints:
