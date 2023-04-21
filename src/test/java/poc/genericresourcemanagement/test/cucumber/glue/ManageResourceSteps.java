@@ -41,6 +41,9 @@ public class ManageResourceSteps implements En {
                         .body(requestBody)
                         .when()
                         .post("/resources/{resourceType}/", resourceType));
+        When("I approve the create {resourceType} resource request {string}",
+                (ResourceDomainModel.ResourceType resourceType, String requestId) -> response = given()
+                        .post("/resources/{resourceType}/{requestId}/approve", resourceType, requestId));
 
         Then("the resource response is an empty array", () -> {
             final JsonNode jsonNode = objectMapper.readTree(response.body().asString());
@@ -51,7 +54,7 @@ public class ManageResourceSteps implements En {
         });
         Then("the resource request is (successfully processed)(failed) with http status code {int}",
                 (Integer expectedHttpStatusCode) -> response.then().statusCode(expectedHttpStatusCode));
-        Then("the {resourceType} response of with id {string} should contain the base info:",
+        Then("the query/approve {resourceType} response by request id {string} should contain the base info:",
                 (ResourceDomainModel.ResourceType resourceType, String requestId, DataTable dataTable) -> {
                     response = when().get("/resources/{resourceType}/{requestId}", resourceType, requestId);
                     final JsonNode actualResult = objectMapper.readTree(response.body().asString());

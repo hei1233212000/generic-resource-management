@@ -2,6 +2,7 @@ package poc.genericresourcemanagement.application.service.resource;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.springframework.transaction.annotation.Transactional;
 import poc.genericresourcemanagement.application.model.CreateResourceRequest;
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
@@ -13,6 +14,7 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 
 @RequiredArgsConstructor
+@Transactional
 public class ResourceService {
     private final TimeGenerator timeGenerator;
     private final ResourceRepository resourceRepository;
@@ -30,8 +32,7 @@ public class ResourceService {
             final ResourceDomainModel.ResourceType type,
             final long id
     ) {
-        return resourceRepository.findByTypeAndId(type, id)
-                .map(this::convert);
+        return findResource(type, id).map(this::convert);
     }
 
     public Mono<ResourceDomainModel> createResource(
@@ -42,6 +43,33 @@ public class ResourceService {
                 .map(newId -> convert(newId, createResourceRequest))
                 .flatMap(resourceRepository::save)
                 .map(this::convert);
+    }
+
+    public Mono<ResourceDomainModel> approveResource(
+            final ResourceDomainModel.ResourceType type,
+            final long resourceRequestId
+    ) {
+        return findResource(type, resourceRequestId)
+                .flatMap(resource -> resourceRepository.updateStatus(
+                        resource.getType(),
+                        resource.getId(),
+                        resource.getVersion(),
+                        ResourceDomainModel.ResourceStatus.APPROVED,
+                        "approver",
+                        timeGenerator.currentLocalDateTime()
+                ))
+                .flatMap(updatedCount -> {
+                    if (updatedCount == 1) {
+                        return findResource(type, resourceRequestId);
+                    } else {
+                        return Mono.error(new IllegalStateException("failed to update with update count " + updatedCount));
+                    }
+                })
+                .map(this::convert);
+    }
+
+    private Mono<ResourcePersistenceEntity> findResource(final ResourceDomainModel.ResourceType type, final long id) {
+        return resourceRepository.findByTypeAndId(type, id);
     }
 
     @SneakyThrows

@@ -40,6 +40,8 @@ public class ResourceRouter {
                 .POST("/resources/{type}",
                         contentType(MediaType.APPLICATION_JSON).and(accept(MediaType.APPLICATION_JSON)),
                         request -> createResource(request, resourceService))
+                .POST("/resources/{type}/{id}/approve", accept(MediaType.APPLICATION_JSON),
+                        request -> approveResource(request, resourceService))
                 .build();
     }
 
@@ -47,12 +49,10 @@ public class ResourceRouter {
             final ServerRequest request,
             final ResourceService resourceService
     ) {
-        final Mono<List<ResourceDto>> resource =
-                resourceService.findResourceDomainModelsByType(
-                                ResourceDomainModel.ResourceType.valueOf(request.pathVariable("type"))
-                        )
-                        .collectList()
-                        .map(l -> l.stream().map(this::convert).collect(Collectors.toList()));
+        final ResourceDomainModel.ResourceType type = extractResourceType(request);
+        final Mono<List<ResourceDto>> resource = resourceService.findResourceDomainModelsByType(type)
+                .collectList()
+                .map(l -> l.stream().map(ResourceRouter::convert).collect(Collectors.toList()));
         return ServerResponse.ok()
                 .body(BodyInserters.fromPublisher(
                         resource,
@@ -66,17 +66,16 @@ public class ResourceRouter {
     ) {
         final Mono<ResourceDto> resource =
                 resourceService.findResourceDomainModelById(
-                                ResourceDomainModel.ResourceType.valueOf(request.pathVariable("type")),
-                                Long.parseLong(request.pathVariable("id"))
+                                extractResourceType(request),
+                                extractResourceRequestId(request)
                         )
-                        .map(this::convert);
+                        .map(ResourceRouter::convert);
         return ServerResponse.ok()
                 .body(BodyInserters.fromPublisher(resource, ResourceDto.class));
     }
 
     private Mono<ServerResponse> createResource(final ServerRequest request, final ResourceService resourceService) {
-        final ResourceDomainModel.ResourceType type =
-                ResourceDomainModel.ResourceType.valueOf(request.pathVariable("type"));
+        final ResourceDomainModel.ResourceType type = extractResourceType(request);
         final Mono<ResourceDto> resource = request.bodyToMono(CreateResourceRequestDto.class)
                 .map(r -> CreateResourceRequest.builder()
                         .type(type)
@@ -84,12 +83,24 @@ public class ResourceRouter {
                         .createdBy("user")
                         .build())
                 .flatMap(resourceService::createResource)
-                .map(this::convert);
+                .map(ResourceRouter::convert);
         return ServerResponse.status(HttpStatusCode.valueOf(201))
                 .body(BodyInserters.fromPublisher(resource, ResourceDto.class));
     }
 
-    private ResourceDto convert(final ResourceDomainModel resourceDomainModel) {
+    private Mono<ServerResponse> approveResource(
+            final ServerRequest request,
+            final ResourceService resourceService
+    ) {
+        final ResourceDomainModel.ResourceType type = extractResourceType(request);
+        final long resourceRequestId = extractResourceRequestId(request);
+        final Mono<ResourceDto> resource = resourceService.approveResource(type, resourceRequestId)
+                .map(ResourceRouter::convert);
+        return ServerResponse.status(HttpStatusCode.valueOf(200))
+                .body(BodyInserters.fromPublisher(resource, ResourceDto.class));
+    }
+
+    private static ResourceDto convert(final ResourceDomainModel resourceDomainModel) {
         return ResourceDto.builder()
                 .type(resourceDomainModel.type())
                 .id(resourceDomainModel.id())
@@ -101,5 +112,13 @@ public class ResourceRouter {
                 .updatedBy(resourceDomainModel.updatedBy())
                 .updatedTime(resourceDomainModel.updatedTime())
                 .build();
+    }
+
+    private static ResourceDomainModel.ResourceType extractResourceType(final ServerRequest request) {
+        return ResourceDomainModel.ResourceType.valueOf(request.pathVariable("type"));
+    }
+
+    private static long extractResourceRequestId(final ServerRequest request) {
+        return Long.parseLong(request.pathVariable("id"));
     }
 }

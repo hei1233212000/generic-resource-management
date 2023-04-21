@@ -61,6 +61,6 @@ public class ResourcePersistenceEntity {
         private ResourceDomainModel.ResourceType type;
 
         @Column
-        private String id;
+        private Long id;
     }
 }
