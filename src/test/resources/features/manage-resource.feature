@@ -57,7 +57,21 @@ Feature: Manage resource
     When I approve the create USER resource request "1"
     Then the resource request is failed with http status code 404
 
-  Scenario: should have validation error if reason is not provided
+  Scenario: should have validation error when approving USER resource which does not exists
+    Given there is no resource exist
+    And I create a APPROVED USER resource request "1" in DB with content
+    """
+    {
+      "name": "Peter",
+      "age": 18
+    }
+    """
+    When I approve the create USER resource request "1"
+    Then the resource request is failed with http status code 400
+    And I got the error messages:
+      | cannot approve USER resource request with id '1' because it is in 'APPROVED' state |
+
+  Scenario: should have validation error when create resource with reason is not provided
     Given there is no resource exist
     When I fire the create USER resource request as
     """
@@ -73,7 +87,7 @@ Feature: Manage resource
     And I got the error messages:
       | 'reason' must not be blank |
 
-  Scenario: should have validation error if user age is not provided
+  Scenario: should have validation error when create USER resource with user age is not provided
     Given there is no resource exist
     When I fire the create USER resource request as
     """

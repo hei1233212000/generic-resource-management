@@ -3,6 +3,7 @@ package poc.genericresourcemanagement.application.service.resource;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.transaction.annotation.Transactional;
+import poc.genericresourcemanagement.application.error.FailToChangeResourceRequestStatusException;
 import poc.genericresourcemanagement.application.model.CreateResourceRequest;
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
@@ -51,6 +52,16 @@ public class ResourceService {
             final long resourceRequestId
     ) {
         return findResource(type, resourceRequestId)
+                .doOnNext(resource -> {
+                    if(resource.getStatus() != ResourceDomainModel.ResourceStatus.PENDING_APPROVAL) {
+                        throw new FailToChangeResourceRequestStatusException(
+                                FailToChangeResourceRequestStatusException.Operation.APPROVE,
+                                resource.getType(),
+                                resource.getId(),
+                                resource.getStatus()
+                        );
+                    }
+                })
                 .doOnNext(resource -> resourceValidationService.validate(resource.getType(), resource.getContent()))
                 .flatMap(resource -> resourceRepository.updateStatus(
                         resource.getType(),
@@ -61,10 +72,11 @@ public class ResourceService {
                         timeGenerator.currentLocalDateTime()
                 ))
                 .flatMap(updatedCount -> {
-                    if (updatedCount == 1) {
+                    if(updatedCount == 1) {
                         return findResource(type, resourceRequestId);
                     } else {
-                        return Mono.error(new IllegalStateException("failed to update with update count " + updatedCount));
+                        return Mono.error(
+                                new IllegalStateException("failed to update with update count " + updatedCount));
                     }
                 })
                 .map(this::convert);

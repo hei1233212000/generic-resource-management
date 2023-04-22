@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.*;
+import poc.genericresourcemanagement.application.error.FailToChangeResourceRequestStatusException;
 import poc.genericresourcemanagement.application.error.ValidationErrorException;
 import poc.genericresourcemanagement.interfaces.model.ErrorResponseDto;
 import reactor.core.publisher.Mono;
@@ -46,6 +47,9 @@ public class ErrorHandlingFunction extends AbstractErrorWebExceptionHandler {
         if(error instanceof ValidationErrorException) {
             return HttpStatus.BAD_REQUEST;
         }
+        if(error instanceof FailToChangeResourceRequestStatusException) {
+            return HttpStatus.BAD_REQUEST;
+        }
         return HttpStatus.INTERNAL_SERVER_ERROR;
     }
 
@@ -54,6 +58,13 @@ public class ErrorHandlingFunction extends AbstractErrorWebExceptionHandler {
         final Throwable error = getError(serverRequest);
         if(error instanceof ValidationErrorException) {
             errorMessages = ((ValidationErrorException) error).getMessages();
+        } else if(error instanceof final FailToChangeResourceRequestStatusException exception) {
+            errorMessages = List.of(
+                    String.format("cannot %s %s resource request with id '%s' because it is in '%s' state",
+                            exception.getOperation().name().toLowerCase(), exception.getResourceType(),
+                            exception.getResourceRequestId(), exception.getCurrentStatus()
+                    )
+            );
         } else {
             errorMessages = List.of("Unknown error");
         }
