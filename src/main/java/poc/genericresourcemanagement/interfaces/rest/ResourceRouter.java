@@ -1,9 +1,8 @@
 package poc.genericresourcemanagement.interfaces.rest;
 
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatusCode;
-import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
@@ -16,31 +15,32 @@ import poc.genericresourcemanagement.interfaces.model.CreateResourceRequestDto;
 import poc.genericresourcemanagement.interfaces.model.ResourceDto;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.server.RequestPredicates.accept;
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 
+@Log4j2
 public class ResourceRouter {
     @Bean
     RouterFunction<ServerResponse> resourceRoutes(
             final ResourceService resourceService
     ) {
         return RouterFunctions.route()
-                .GET("/resources/{type}/{id}", accept(MediaType.APPLICATION_JSON),
+                .GET("/resources/{type}/{id}", accept(APPLICATION_JSON),
                         request -> getResource(request, resourceService))
-                .GET("/resources/{type}/", accept(MediaType.APPLICATION_JSON),
+                .GET("/resources/{type}/", accept(APPLICATION_JSON),
                         request -> getResources(request, resourceService))
-                .GET("/resources/{type}", accept(MediaType.APPLICATION_JSON),
+                .GET("/resources/{type}", accept(APPLICATION_JSON),
                         request -> getResources(request, resourceService))
                 .POST("/resources/{type}/",
-                        contentType(MediaType.APPLICATION_JSON).and(accept(MediaType.APPLICATION_JSON)),
+                        contentType(APPLICATION_JSON).and(accept(APPLICATION_JSON)),
                         request -> createResource(request, resourceService))
                 .POST("/resources/{type}",
-                        contentType(MediaType.APPLICATION_JSON).and(accept(MediaType.APPLICATION_JSON)),
+                        contentType(APPLICATION_JSON).and(accept(APPLICATION_JSON)),
                         request -> createResource(request, resourceService))
-                .POST("/resources/{type}/{id}/approve", accept(MediaType.APPLICATION_JSON),
+                .POST("/resources/{type}/{id}/approve", accept(APPLICATION_JSON),
                         request -> approveResource(request, resourceService))
                 .build();
     }
@@ -49,14 +49,12 @@ public class ResourceRouter {
             final ServerRequest request,
             final ResourceService resourceService
     ) {
-        final ResourceDomainModel.ResourceType type = extractResourceType(request);
-        final Mono<List<ResourceDto>> resource = resourceService.findResourceDomainModelsByType(type)
+        return resourceService.findResourceDomainModelsByType(extractResourceType(request))
                 .collectList()
-                .map(l -> l.stream().map(ResourceRouter::convert).collect(Collectors.toList()));
-        return ServerResponse.ok()
-                .body(BodyInserters.fromPublisher(
-                        resource,
-                        new ParameterizedTypeReference<>() {})
+                .map(l -> l.stream().map(ResourceRouter::convert).collect(Collectors.toList()))
+                .flatMap(resources -> ServerResponse.ok()
+                        .contentType(APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(resources))
                 );
     }
 
@@ -64,41 +62,46 @@ public class ResourceRouter {
             final ServerRequest request,
             final ResourceService resourceService
     ) {
-        final Mono<ResourceDto> resource =
-                resourceService.findResourceDomainModelById(
-                                extractResourceType(request),
-                                extractResourceRequestId(request)
-                        )
-                        .map(ResourceRouter::convert);
-        return ServerResponse.ok()
-                .body(BodyInserters.fromPublisher(resource, ResourceDto.class));
+        return resourceService.findResourceDomainModelById(
+                        extractResourceType(request),
+                        extractResourceRequestId(request)
+                )
+                .map(ResourceRouter::convert)
+                .flatMap(resource -> ServerResponse.ok()
+                        .contentType(APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(resource))
+                )
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     private Mono<ServerResponse> createResource(final ServerRequest request, final ResourceService resourceService) {
-        final ResourceDomainModel.ResourceType type = extractResourceType(request);
-        final Mono<ResourceDto> resource = request.bodyToMono(CreateResourceRequestDto.class)
+        return request.bodyToMono(CreateResourceRequestDto.class)
                 .map(r -> CreateResourceRequest.builder()
-                        .type(type)
+                        .type(extractResourceType(request))
                         .reason(r.reason())
                         .content(r.content())
                         .createdBy("user")
                         .build())
                 .flatMap(resourceService::createResource)
-                .map(ResourceRouter::convert);
-        return ServerResponse.status(HttpStatusCode.valueOf(201))
-                .body(BodyInserters.fromPublisher(resource, ResourceDto.class));
+                .map(ResourceRouter::convert)
+                .flatMap(resource -> ServerResponse.status(HttpStatusCode.valueOf(201))
+                        .contentType(APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(resource))
+                );
     }
 
     private Mono<ServerResponse> approveResource(
             final ServerRequest request,
             final ResourceService resourceService
     ) {
-        final ResourceDomainModel.ResourceType type = extractResourceType(request);
-        final long resourceRequestId = extractResourceRequestId(request);
-        final Mono<ResourceDto> resource = resourceService.approveResource(type, resourceRequestId)
-                .map(ResourceRouter::convert);
-        return ServerResponse.status(HttpStatusCode.valueOf(200))
-                .body(BodyInserters.fromPublisher(resource, ResourceDto.class));
+        return resourceService.approveResource(
+                        extractResourceType(request), extractResourceRequestId(request)
+                )
+                .map(ResourceRouter::convert)
+                .flatMap(resource -> ServerResponse.status(HttpStatusCode.valueOf(200))
+                        .contentType(APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(resource))
+                );
     }
 
     private static ResourceDto convert(final ResourceDomainModel resourceDomainModel) {

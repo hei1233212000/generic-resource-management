@@ -5,8 +5,13 @@ Feature: Manage resource
 
   Scenario: query USER resources
     Given there is no resource exist
-    When query all USER resources
+    When I query all USER resources
     Then the resource response is an empty array
+
+  Scenario: query USER resource which does not exists
+    Given there is no resource exist
+    When I query USER resource by request id "1"
+    Then the resource request is failed with http status code 404
 
   Scenario: create USER resource
     Given there is no resource exist
@@ -60,7 +65,7 @@ Feature: Manage resource
     }
     """
     Then the resource request is failed with http status code 400
-    And we got the error messages:
+    And I got the error messages:
       | 'reason' must not be blank |
 
   Scenario: should have validation error if user age is not provided
@@ -75,12 +80,12 @@ Feature: Manage resource
     }
     """
     Then the resource request is failed with http status code 400
-    And we got the error messages:
+    And I got the error messages:
       | missing 'age' |
 
   Scenario: should have validation on approval
     Given there is no resource exist
-    And we create a PENDING_APPROVAL USER resource request "1" in DB with content
+    And I create a PENDING_APPROVAL USER resource request "1" in DB with content
     """
     {
       "name": "Peter"
@@ -88,5 +93,5 @@ Feature: Manage resource
     """
     When I approve the create USER resource request "1"
     Then the resource request is failed with http status code 400
-    And we got the error messages:
+    And I got the error messages:
       | missing 'age' |

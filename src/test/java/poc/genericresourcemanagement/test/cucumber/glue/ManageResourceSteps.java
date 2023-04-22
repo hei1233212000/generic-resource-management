@@ -33,7 +33,7 @@ public class ManageResourceSteps implements En {
     ) {
         Given("there is no resource exist", () -> assertThat(resourceRepository.count().block())
                 .isZero());
-        Given("we create a {resourceStatus} {resourceType} resource request {string} in DB with content",
+        Given("I create a {resourceStatus} {resourceType} resource request {string} in DB with content",
                 (ResourceDomainModel.ResourceStatus resourceStatus, ResourceDomainModel.ResourceType resourceType, String requestId, String requestContent) -> {
                     final LocalDateTime currentLocalDateTime = timeGenerator.currentLocalDateTime();
                     final long id = Long.parseLong(requestId);
@@ -54,8 +54,10 @@ public class ManageResourceSteps implements En {
                             .as("resource should be created")
                             .isNotNull();
                 });
-
-        When("query all {resourceType} resources", (ResourceDomainModel.ResourceType resourceType) -> response = when()
+        When("I query {resourceType} resource by request id {string}",
+                (ResourceDomainModel.ResourceType resourceType, String requestId) -> response = when()
+                        .get("/resources/{resourceType}/{requestId}", resourceType, requestId));
+        When("I query all {resourceType} resources", (ResourceDomainModel.ResourceType resourceType) -> response = when()
                 .get("/resources/{resourceType}/", resourceType)
                 .then()
                 .statusCode(200)
@@ -90,7 +92,7 @@ public class ManageResourceSteps implements En {
             final JsonNode actualResult = responseNode.get("content");
             verifyJsonNode(dataTable, actualResult);
         });
-        Then("we got the error messages:", (DataTable dataTable) -> {
+        Then("I got the error messages:", (DataTable dataTable) -> {
             final List<String> expectedErrorMessages = dataTable.asList();
 
             final JsonNode responseNode = objectMapper.readTree(response.body().asString());
