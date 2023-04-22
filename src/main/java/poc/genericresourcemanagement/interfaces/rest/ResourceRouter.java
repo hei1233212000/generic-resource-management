@@ -101,7 +101,8 @@ public class ResourceRouter {
                 .flatMap(resource -> ServerResponse.status(HttpStatusCode.valueOf(200))
                         .contentType(APPLICATION_JSON)
                         .body(BodyInserters.fromValue(resource))
-                );
+                )
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     private static ResourceDto convert(final ResourceDomainModel resourceDomainModel) {

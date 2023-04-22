@@ -51,7 +51,7 @@ public class ResourceService {
             final long resourceRequestId
     ) {
         return findResource(type, resourceRequestId)
-                .doOnSuccess(resource -> resourceValidationService.validate(resource.getType(), resource.getContent()))
+                .doOnNext(resource -> resourceValidationService.validate(resource.getType(), resource.getContent()))
                 .flatMap(resource -> resourceRepository.updateStatus(
                         resource.getType(),
                         resource.getId(),

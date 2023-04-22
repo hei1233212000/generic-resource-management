@@ -8,11 +8,6 @@ Feature: Manage resource
     When I query all USER resources
     Then the resource response is an empty array
 
-  Scenario: query USER resource which does not exists
-    Given there is no resource exist
-    When I query USER resource by request id "1"
-    Then the resource request is failed with http status code 404
-
   Scenario: create USER resource
     Given there is no resource exist
     When I fire the create USER resource request as
@@ -51,6 +46,16 @@ Feature: Manage resource
 #    And the USER is persisted into the database with details:
 #      | name | Peter |
 #      | age  | 18    |
+
+  Scenario: should have not found error when querying USER resource which does not exists
+    Given there is no resource exist
+    When I query USER resource by request id "1"
+    Then the resource request is failed with http status code 404
+
+  Scenario: should have not found error when approving USER resource which does not exists
+    Given there is no resource exist
+    When I approve the create USER resource request "1"
+    Then the resource request is failed with http status code 404
 
   Scenario: should have validation error if reason is not provided
     Given there is no resource exist
