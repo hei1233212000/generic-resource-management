@@ -1,10 +1,10 @@
 package poc.genericresourcemanagement.application.service.resource.validation;
 
-import poc.genericresourcemanagement.application.model.CreateResourceRequest;
+import com.fasterxml.jackson.databind.JsonNode;
 import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
 
-public interface ResourceCreationValidator {
+public interface ResourceValidator {
     boolean isSupported(final ResourceDomainModel.ResourceType resourceType);
 
-    void validate(final CreateResourceRequest createResourceRequest);
+    void validate(final JsonNode resource);
 }

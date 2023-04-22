@@ -10,8 +10,9 @@ import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.application.service.resource.ResourceCreationValidationService;
 import poc.genericresourcemanagement.application.service.resource.ResourceIdGeneratorService;
 import poc.genericresourcemanagement.application.service.resource.ResourceService;
+import poc.genericresourcemanagement.application.service.resource.ResourceValidationService;
 import poc.genericresourcemanagement.application.service.resource.id.ResourceIdGenerator;
-import poc.genericresourcemanagement.application.service.resource.validation.ResourceCreationValidator;
+import poc.genericresourcemanagement.application.service.resource.validation.ResourceValidator;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRepository;
 
 import java.util.List;
@@ -31,10 +32,12 @@ public class ResourceApplicationConfig {
             final TimeGenerator timeGenerator,
             final ResourceRepository resourceRepository,
             final ResourceIdGeneratorService resourceIdGeneratorService,
-            final ResourceCreationValidationService resourceCreationValidationService
+            final ResourceCreationValidationService resourceCreationValidationService,
+            final ResourceValidationService resourceValidationService
     ) {
         return new ResourceService(
-                timeGenerator, resourceRepository, resourceIdGeneratorService, resourceCreationValidationService
+                timeGenerator, resourceRepository, resourceIdGeneratorService, resourceCreationValidationService,
+                resourceValidationService
         );
     }
 
@@ -48,9 +51,14 @@ public class ResourceApplicationConfig {
     @Bean
     ResourceCreationValidationService resourceCreationValidationService(
             final BeanValidationService beanValidationService,
-            final List<ResourceCreationValidator> validators
+            final ResourceValidationService resourceValidationService
     ) {
-        return new ResourceCreationValidationService(beanValidationService, validators);
+        return new ResourceCreationValidationService(beanValidationService, resourceValidationService);
+    }
+
+    @Bean
+    ResourceValidationService resourceValidationService(final List<ResourceValidator> resourceValidators) {
+        return new ResourceValidationService(resourceValidators);
     }
 
     @Bean

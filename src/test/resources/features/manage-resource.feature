@@ -77,3 +77,16 @@ Feature: Manage resource
     Then the resource request is failed with http status code 400
     And we got the error messages:
       | missing 'age' |
+
+  Scenario: should have validation on approval
+    Given there is no resource exist
+    And we create a PENDING_APPROVAL USER resource request "1" in DB with content
+    """
+    {
+      "name": "Peter"
+    }
+    """
+    When I approve the create USER resource request "1"
+    Then the resource request is failed with http status code 400
+    And we got the error messages:
+      | missing 'age' |

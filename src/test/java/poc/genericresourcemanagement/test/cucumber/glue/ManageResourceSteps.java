@@ -8,9 +8,12 @@ import io.cucumber.java8.En;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import lombok.extern.log4j.Log4j2;
+import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
+import poc.genericresourcemanagement.infrastructure.persistence.model.ResourcePersistenceEntity;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -25,10 +28,32 @@ public class ManageResourceSteps implements En {
 
     public ManageResourceSteps(
             final ResourceRepository resourceRepository,
-            final ObjectMapper objectMapper
+            final ObjectMapper objectMapper,
+            final TimeGenerator timeGenerator
     ) {
         Given("there is no resource exist", () -> assertThat(resourceRepository.count().block())
                 .isZero());
+        Given("we create a {resourceStatus} {resourceType} resource request {string} in DB with content",
+                (ResourceDomainModel.ResourceStatus resourceStatus, ResourceDomainModel.ResourceType resourceType, String requestId, String requestContent) -> {
+                    final LocalDateTime currentLocalDateTime = timeGenerator.currentLocalDateTime();
+                    final long id = Long.parseLong(requestId);
+                    final ResourcePersistenceEntity resourcePersistenceEntity = ResourcePersistenceEntity.builder()
+                            .type(resourceType)
+                            .id(id)
+                            .content(objectMapper.readTree(requestContent))
+                            .reason("for testing")
+                            .status(resourceStatus)
+                            .createdBy("testStep")
+                            .createdTime(currentLocalDateTime)
+                            .updatedBy("testStep")
+                            .updatedTime(currentLocalDateTime)
+                            .build();
+                    resourceRepository.save(resourcePersistenceEntity).block();
+                    final ResourcePersistenceEntity resource = resourceRepository.findByTypeAndId(resourceType, id).block();
+                    assertThat(resource)
+                            .as("resource should be created")
+                            .isNotNull();
+                });
 
         When("query all {resourceType} resources", (ResourceDomainModel.ResourceType resourceType) -> response = when()
                 .get("/resources/{resourceType}/", resourceType)
@@ -79,6 +104,8 @@ public class ManageResourceSteps implements En {
 
         ParameterType("resourceType", ".*",
                 (String resourceType) -> ResourceDomainModel.ResourceType.valueOf(resourceType));
+        ParameterType("resourceStatus", ".*",
+                (String resourceStatus) -> ResourceDomainModel.ResourceStatus.valueOf(resourceStatus));
     }
 
     private static void verifyJsonNode(final DataTable dataTable, final JsonNode actualResult) {

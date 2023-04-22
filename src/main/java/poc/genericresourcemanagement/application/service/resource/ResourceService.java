@@ -20,6 +20,7 @@ public class ResourceService {
     private final ResourceRepository resourceRepository;
     private final ResourceIdGeneratorService resourceIdGeneratorService;
     private final ResourceCreationValidationService resourceCreationValidationService;
+    private final ResourceValidationService resourceValidationService;
 
     public Flux<ResourceDomainModel> findResourceDomainModelsByType(
             final ResourceDomainModel.ResourceType type
@@ -50,6 +51,7 @@ public class ResourceService {
             final long resourceRequestId
     ) {
         return findResource(type, resourceRequestId)
+                .doOnSuccess(resource -> resourceValidationService.validate(resource.getType(), resource.getContent()))
                 .flatMap(resource -> resourceRepository.updateStatus(
                         resource.getType(),
                         resource.getId(),
