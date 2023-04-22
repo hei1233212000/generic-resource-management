@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import org.springframework.transaction.annotation.Transactional;
 import poc.genericresourcemanagement.application.error.FailToChangeResourceRequestStatusException;
 import poc.genericresourcemanagement.application.model.CreateResourceRequest;
+import poc.genericresourcemanagement.application.model.Operation;
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
 import poc.genericresourcemanagement.infrastructure.persistence.model.ResourcePersistenceEntity;
@@ -47,30 +48,40 @@ public class ResourceService {
                 .map(this::convert);
     }
 
-    public Mono<ResourceDomainModel> approveResource(
+    public Mono<ResourceDomainModel> approveOrCancelResource(
             final ResourceDomainModel.ResourceType type,
-            final long resourceRequestId
+            final long resourceRequestId,
+            final Operation operation
     ) {
         return findResource(type, resourceRequestId)
                 .doOnNext(resource -> {
                     if(resource.getStatus() != ResourceDomainModel.ResourceStatus.PENDING_APPROVAL) {
                         throw new FailToChangeResourceRequestStatusException(
-                                FailToChangeResourceRequestStatusException.Operation.APPROVE,
+                                operation,
                                 resource.getType(),
                                 resource.getId(),
                                 resource.getStatus()
                         );
                     }
                 })
-                .doOnNext(resource -> resourceValidationService.validate(resource.getType(), resource.getContent()))
-                .flatMap(resource -> resourceRepository.updateStatus(
-                        resource.getType(),
-                        resource.getId(),
-                        resource.getVersion(),
-                        ResourceDomainModel.ResourceStatus.APPROVED,
-                        "approver",
-                        timeGenerator.currentLocalDateTime()
-                ))
+                .doOnNext(resource -> {
+                    if(operation == Operation.APPROVE) {
+                        resourceValidationService.validate(resource.getType(), resource.getContent());
+                    }
+                })
+                .flatMap(resource -> {
+                    final ResourceDomainModel.ResourceStatus resourceStatus = operation == Operation.APPROVE
+                            ? ResourceDomainModel.ResourceStatus.APPROVED
+                            : ResourceDomainModel.ResourceStatus.CANCELLED;
+                    return resourceRepository.updateStatus(
+                            resource.getType(),
+                            resource.getId(),
+                            resource.getVersion(),
+                            resourceStatus,
+                            "approver",
+                            timeGenerator.currentLocalDateTime()
+                    );
+                })
                 .flatMap(updatedCount -> {
                     if(updatedCount == 1) {
                         return findResource(type, resourceRequestId);

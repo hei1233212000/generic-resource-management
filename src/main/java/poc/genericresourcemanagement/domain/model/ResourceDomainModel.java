@@ -23,6 +23,6 @@ public record ResourceDomainModel(
     }
 
     public enum ResourceStatus {
-        PENDING_APPROVAL, APPROVED, REJECTED, CANCELLED
+        PENDING_APPROVAL, APPROVED, CANCELLED
     }
 }

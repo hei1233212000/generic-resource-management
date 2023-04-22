@@ -2,6 +2,7 @@ package poc.genericresourcemanagement.application.error;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import poc.genericresourcemanagement.application.model.Operation;
 import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
 
 @RequiredArgsConstructor
@@ -12,7 +13,4 @@ public class FailToChangeResourceRequestStatusException extends RuntimeException
     private final long resourceRequestId;
     private final ResourceDomainModel.ResourceStatus currentStatus;
 
-    public enum Operation {
-        APPROVE
-    }
 }

@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import poc.genericresourcemanagement.application.model.CreateResourceRequest;
+import poc.genericresourcemanagement.application.model.Operation;
 import poc.genericresourcemanagement.application.service.resource.ResourceService;
 import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
 import poc.genericresourcemanagement.interfaces.model.CreateResourceRequestDto;
@@ -41,7 +42,9 @@ public class ResourceRouter {
                         contentType(APPLICATION_JSON).and(accept(APPLICATION_JSON)),
                         request -> createResource(request, resourceService))
                 .POST("/resources/{type}/{id}/approve", accept(APPLICATION_JSON),
-                        request -> approveResource(request, resourceService))
+                        request -> approveOrCancelResource(request, resourceService, Operation.APPROVE))
+                .POST("/resources/{type}/{id}/cancel", accept(APPLICATION_JSON),
+                        request -> approveOrCancelResource(request, resourceService, Operation.CANCEL))
                 .build();
     }
 
@@ -90,12 +93,13 @@ public class ResourceRouter {
                 );
     }
 
-    private Mono<ServerResponse> approveResource(
+    private Mono<ServerResponse> approveOrCancelResource(
             final ServerRequest request,
-            final ResourceService resourceService
+            final ResourceService resourceService,
+            final Operation operation
     ) {
-        return resourceService.approveResource(
-                        extractResourceType(request), extractResourceRequestId(request)
+        return resourceService.approveOrCancelResource(
+                        extractResourceType(request), extractResourceRequestId(request), operation
                 )
                 .map(ResourceRouter::convert)
                 .flatMap(resource -> ServerResponse.status(HttpStatusCode.valueOf(200))

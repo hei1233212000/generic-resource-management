@@ -34,7 +34,7 @@ Feature: Manage resource
       | age  | 18    |
 
     When the current time is "2023-02-03T23:00:00.000"
-    And I approve the create USER resource request "1"
+    And I approve the USER resource request "1"
     Then the resource request is successfully processed with http status code 200
     And the approve USER response by request id "1" should contain the base info:
       | type        | USER                    |
@@ -47,29 +47,59 @@ Feature: Manage resource
 #      | name | Peter |
 #      | age  | 18    |
 
-  Scenario: should have not found error when querying USER resource which does not exists
+  Scenario: should able to cancel USER resource request
     Given there is no resource exist
-    When I query USER resource by request id "1"
-    Then the resource request is failed with http status code 404
-
-  Scenario: should have not found error when approving USER resource which does not exists
-    Given there is no resource exist
-    When I approve the create USER resource request "1"
-    Then the resource request is failed with http status code 404
-
-  Scenario: should have validation error when approving USER resource which does not exists
-    Given there is no resource exist
-    And I create a APPROVED USER resource request "1" in DB with content
+    And I create a PENDING_APPROVAL USER resource request "1" in DB with content
     """
     {
       "name": "Peter",
       "age": 18
     }
     """
-    When I approve the create USER resource request "1"
+    When the current time is "2023-02-03T23:00:00.000"
+    And I cancel the USER resource request "1"
+    Then the resource request is failed with http status code 200
+    And the query USER response by request id "1" should contain the base info:
+      | type        | USER                    |
+      | id          | 1                       |
+      | status      | CANCELLED               |
+      | version     | 1                       |
+      | createdTime | 2023-02-03T12:34:56.123 |
+      | updatedTime | 2023-02-03T23:00:00.000 |
+
+  Scenario: should have not found error when querying USER resource which does not exists
+    Given there is no resource exist
+    When I query USER resource by request id "1"
+    Then the resource request is failed with http status code 404
+
+  Scenario Outline: should have not found error when approving or cancelling USER resource which does not exists
+    Given there is no resource exist
+    When I <operation> the USER resource request "1"
+    Then the resource request is failed with http status code 404
+    Examples:
+      | operation |
+      | approve   |
+      | cancel    |
+
+  Scenario Outline: should have validation error when approving or cancelling USER resource is not in pending approval status
+    Given there is no resource exist
+    And I create a <originalRequestStatus> USER resource request "1" in DB with content
+    """
+    {
+      "name": "Peter",
+      "age": 18
+    }
+    """
+    When I <operation> the USER resource request "1"
     Then the resource request is failed with http status code 400
     And I got the error messages:
-      | cannot approve USER resource request with id '1' because it is in 'APPROVED' state |
+      | cannot <operation> USER resource request with id '1' because it is in '<originalRequestStatus>' state |
+    Examples:
+      | operation | originalRequestStatus |
+      | approve   | APPROVED              |
+      | approve   | CANCELLED             |
+      | cancel    | APPROVED              |
+      | cancel    | CANCELLED             |
 
   Scenario: should have validation error when create resource with reason is not provided
     Given there is no resource exist
@@ -102,7 +132,7 @@ Feature: Manage resource
     And I got the error messages:
       | missing 'age' |
 
-  Scenario: should have validation on approval
+  Scenario: should perform validation on approval
     Given there is no resource exist
     And I create a PENDING_APPROVAL USER resource request "1" in DB with content
     """
@@ -110,7 +140,26 @@ Feature: Manage resource
       "name": "Peter"
     }
     """
-    When I approve the create USER resource request "1"
+    When I approve the USER resource request "1"
     Then the resource request is failed with http status code 400
     And I got the error messages:
       | missing 'age' |
+
+  Scenario: should not perform validation on cancel
+    Given there is no resource exist
+    And I create a PENDING_APPROVAL USER resource request "1" in DB with content
+    """
+    {
+      "name": "Peter"
+    }
+    """
+    When the current time is "2023-02-03T23:00:00.000"
+    And I cancel the USER resource request "1"
+    Then the resource request is failed with http status code 200
+    And the query USER response by request id "1" should contain the base info:
+      | type        | USER                    |
+      | id          | 1                       |
+      | status      | CANCELLED               |
+      | version     | 1                       |
+      | createdTime | 2023-02-03T12:34:56.123 |
+      | updatedTime | 2023-02-03T23:00:00.000 |

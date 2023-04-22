@@ -68,9 +68,9 @@ public class ManageResourceSteps implements En {
                         .body(requestBody)
                         .when()
                         .post("/resources/{resourceType}/", resourceType));
-        When("I approve the create {resourceType} resource request {string}",
-                (ResourceDomainModel.ResourceType resourceType, String requestId) -> response = given()
-                        .post("/resources/{resourceType}/{requestId}/approve", resourceType, requestId));
+        When("I {} the {resourceType} resource request {string}",
+                (String requestType, ResourceDomainModel.ResourceType resourceType, String requestId) -> response = given()
+                        .post("/resources/{resourceType}/{requestId}/{requestType}", resourceType, requestId, requestType));
 
         Then("the resource response is an empty array", () -> {
             final JsonNode jsonNode = objectMapper.readTree(response.body().asString());
