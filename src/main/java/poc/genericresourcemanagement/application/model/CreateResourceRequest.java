@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
-import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
+import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
 
 @Builder
 public record CreateResourceRequest(
         @NotNull
-        ResourceDomainModel.ResourceType type,
+        ResourceRequestDomainModel.ResourceType type,
 
         @NotNull
         JsonNode content,

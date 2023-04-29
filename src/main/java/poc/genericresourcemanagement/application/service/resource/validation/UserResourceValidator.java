@@ -3,7 +3,7 @@ package poc.genericresourcemanagement.application.service.resource.validation;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import poc.genericresourcemanagement.application.error.ValidationErrorException;
-import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
+import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,8 +11,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserResourceValidator implements ResourceValidator {
     @Override
-    public boolean isSupported(final ResourceDomainModel.ResourceType resourceType) {
-        return resourceType == ResourceDomainModel.ResourceType.USER;
+    public boolean isSupported(final ResourceRequestDomainModel.ResourceType resourceType) {
+        return resourceType == ResourceRequestDomainModel.ResourceType.USER;
     }
 
     @Override

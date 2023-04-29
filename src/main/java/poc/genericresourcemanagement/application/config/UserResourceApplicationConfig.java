@@ -3,17 +3,17 @@ package poc.genericresourcemanagement.application.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import poc.genericresourcemanagement.application.service.resource.creator.UserResourceCreator;
-import poc.genericresourcemanagement.application.service.resource.id.UserResourceIdGenerator;
+import poc.genericresourcemanagement.application.service.resource.id.UserResourceRequestIdGenerator;
 import poc.genericresourcemanagement.application.service.resource.validation.UserResourceValidator;
-import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRepository;
+import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRequestRepository;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.UserRepository;
 
 public class UserResourceApplicationConfig {
     @Bean
-    UserResourceIdGenerator userResourceIdGenerator(
-            final ResourceRepository resourceRepository
+    UserResourceRequestIdGenerator userResourceRequestIdGenerator(
+            final ResourceRequestRepository resourceRequestRepository
     ) {
-        return new UserResourceIdGenerator(resourceRepository);
+        return new UserResourceRequestIdGenerator(resourceRequestRepository);
     }
 
     @Bean

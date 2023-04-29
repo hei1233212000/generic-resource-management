@@ -9,10 +9,10 @@ import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import lombok.extern.log4j.Log4j2;
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
-import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
-import poc.genericresourcemanagement.infrastructure.persistence.model.ResourcePersistenceEntity;
+import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
+import poc.genericresourcemanagement.infrastructure.persistence.model.ResourceRequestPersistenceEntity;
 import poc.genericresourcemanagement.infrastructure.persistence.model.UserPersistenceEntity;
-import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRepository;
+import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRequestRepository;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.UserRepository;
 
 import java.time.LocalDateTime;
@@ -29,31 +29,32 @@ public class ManageResourceSteps implements En {
     private Response response;
 
     public ManageResourceSteps(
-            final ResourceRepository resourceRepository,
+            final ResourceRequestRepository resourceRequestRepository,
             final UserRepository userRepository,
             final ObjectMapper objectMapper,
             final TimeGenerator timeGenerator
     ) {
-        Given("there is no resource exist", () -> assertThat(resourceRepository.count().block())
+        Given("there is no resource exist", () -> assertThat(resourceRequestRepository.count().block())
                 .isZero());
         Given("I create a {resourceStatus} {resourceType} resource request {string} in DB with content",
-                (ResourceDomainModel.ResourceStatus resourceStatus, ResourceDomainModel.ResourceType resourceType, String requestId, String requestContent) -> {
+                (ResourceRequestDomainModel.ResourceRequestStatus resourceRequestStatus, ResourceRequestDomainModel.ResourceType resourceType, String requestId, String requestContent) -> {
                     final LocalDateTime currentLocalDateTime = timeGenerator.currentLocalDateTime();
                     final long id = Long.parseLong(requestId);
-                    final ResourcePersistenceEntity resourcePersistenceEntity = ResourcePersistenceEntity.builder()
+                    final ResourceRequestPersistenceEntity resourceRequestPersistenceEntity = ResourceRequestPersistenceEntity.builder()
                             .type(resourceType)
                             .id(id)
                             .content(objectMapper.readTree(requestContent))
                             .reason("for testing")
-                            .operation(ResourceDomainModel.Operation.CREATE)
-                            .status(resourceStatus)
+                            .operation(ResourceRequestDomainModel.ResourceRequestOperation.CREATE)
+                            .status(resourceRequestStatus)
                             .createdBy("testStep")
                             .createdTime(currentLocalDateTime)
                             .updatedBy("testStep")
                             .updatedTime(currentLocalDateTime)
                             .build();
-                    resourceRepository.save(resourcePersistenceEntity).block();
-                    final ResourcePersistenceEntity resource = resourceRepository.findByTypeAndId(resourceType, id).block();
+                    resourceRequestRepository.save(resourceRequestPersistenceEntity).block();
+                    final ResourceRequestPersistenceEntity
+                            resource = resourceRequestRepository.findByTypeAndId(resourceType, id).block();
                     assertThat(resource)
                             .as("resource should be created")
                             .isNotNull();
@@ -61,21 +62,21 @@ public class ManageResourceSteps implements En {
         Given("there is no USER exists", () -> assertThat(userRepository.count().block()).isZero());
 
         When("I query {resourceType} resource by request id {string}",
-                (ResourceDomainModel.ResourceType resourceType, String requestId) -> response = when()
+                (ResourceRequestDomainModel.ResourceType resourceType, String requestId) -> response = when()
                         .get("/resources/{resourceType}/{requestId}", resourceType, requestId));
-        When("I query all {resourceType} resources", (ResourceDomainModel.ResourceType resourceType) -> response = when()
+        When("I query all {resourceType} resources", (ResourceRequestDomainModel.ResourceType resourceType) -> response = when()
                 .get("/resources/{resourceType}/", resourceType)
                 .then()
                 .statusCode(200)
                 .extract().response());
         When("I fire the create {resourceType} resource request as",
-                (ResourceDomainModel.ResourceType resourceType, String requestBody) -> response = given()
+                (ResourceRequestDomainModel.ResourceType resourceType, String requestBody) -> response = given()
                         .contentType(ContentType.JSON)
                         .body(requestBody)
                         .when()
                         .post("/resources/{resourceType}/", resourceType));
         When("I {} the {resourceType} resource request {string}",
-                (String requestType, ResourceDomainModel.ResourceType resourceType, String requestId) -> response = given()
+                (String requestType, ResourceRequestDomainModel.ResourceType resourceType, String requestId) -> response = given()
                         .post("/resources/{resourceType}/{requestId}/{requestType}", resourceType, requestId, requestType));
 
         Then("the resource response is an empty array", () -> {
@@ -88,7 +89,7 @@ public class ManageResourceSteps implements En {
         Then("the resource request is (successfully processed)(failed) with http status code {int}",
                 (Integer expectedHttpStatusCode) -> response.then().statusCode(expectedHttpStatusCode));
         Then("the query/approve {resourceType} response by request id {string} should contain the base info:",
-                (ResourceDomainModel.ResourceType resourceType, String requestId, DataTable dataTable) -> {
+                (ResourceRequestDomainModel.ResourceType resourceType, String requestId, DataTable dataTable) -> {
                     response = when().get("/resources/{resourceType}/{requestId}", resourceType, requestId);
                     final JsonNode actualResult = objectMapper.readTree(response.body().asString());
                     verifyJsonNode(dataTable, actualResult);
@@ -117,9 +118,9 @@ public class ManageResourceSteps implements En {
         });
 
         ParameterType("resourceType", ".*",
-                (String resourceType) -> ResourceDomainModel.ResourceType.valueOf(resourceType));
+                (String resourceType) -> ResourceRequestDomainModel.ResourceType.valueOf(resourceType));
         ParameterType("resourceStatus", ".*",
-                (String resourceStatus) -> ResourceDomainModel.ResourceStatus.valueOf(resourceStatus));
+                (String resourceStatus) -> ResourceRequestDomainModel.ResourceRequestStatus.valueOf(resourceStatus));
     }
 
     private static void verifyJsonNode(final DataTable dataTable, final JsonNode actualResult) {

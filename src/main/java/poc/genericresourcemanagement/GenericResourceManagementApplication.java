@@ -3,16 +3,15 @@ package poc.genericresourcemanagement;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
-import poc.genericresourcemanagement.application.config.ResourceApplicationConfig;
-import poc.genericresourcemanagement.infrastructure.persistence.config.ResourcePersistenceConfig;
-import poc.genericresourcemanagement.interfaces.config.ResourceInterfaceConfig;
-import poc.genericresourcemanagement.interfaces.rest.ResourceRouter;
+import poc.genericresourcemanagement.application.config.ApplicationConfig;
+import poc.genericresourcemanagement.infrastructure.persistence.config.PersistenceConfig;
+import poc.genericresourcemanagement.interfaces.config.InterfaceConfig;
 
 @SpringBootApplication
 @Import({
-        ResourceApplicationConfig.class,
-        ResourceInterfaceConfig.class,
-        ResourcePersistenceConfig.class,
+        ApplicationConfig.class,
+        InterfaceConfig.class,
+        PersistenceConfig.class,
 })
 public class GenericResourceManagementApplication {
 

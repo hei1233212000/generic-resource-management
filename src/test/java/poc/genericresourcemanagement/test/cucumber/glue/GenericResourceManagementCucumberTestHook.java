@@ -47,7 +47,7 @@ public class GenericResourceManagementCucumberTestHook implements LambdaGlue {
     }
 
     private static void resetDbSequencers(final R2dbcEntityTemplate r2dbcEntityTemplate) {
-        resetDbSequence(r2dbcEntityTemplate, "USER_REQUEST_ID_SEQ");
+        resetDbSequence(r2dbcEntityTemplate, "USER_RESOURCE_REQUEST_ID_SEQ");
         resetDbSequence(r2dbcEntityTemplate, "USER_ID_SEQ");
     }
 

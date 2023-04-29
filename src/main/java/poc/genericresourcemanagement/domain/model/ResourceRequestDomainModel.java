@@ -6,13 +6,13 @@ import lombok.Builder;
 import java.time.LocalDateTime;
 
 @Builder
-public record ResourceDomainModel(
+public record ResourceRequestDomainModel(
         ResourceType type,
         Long id,
         JsonNode content,
         String reason,
-        Operation operation,
-        ResourceDomainModel.ResourceStatus status,
+        ResourceRequestOperation operation,
+        ResourceRequestStatus status,
         Long version,
         String createdBy,
         LocalDateTime createdTime,
@@ -23,11 +23,11 @@ public record ResourceDomainModel(
         USER
     }
 
-    public enum ResourceStatus {
+    public enum ResourceRequestStatus {
         PENDING_APPROVAL, APPROVED, CANCELLED
     }
 
-    public enum Operation {
+    public enum ResourceRequestOperation {
         CREATE
     }
 }

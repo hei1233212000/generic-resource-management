@@ -5,20 +5,20 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
+import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
 
 import java.io.Serializable;
 
-@Table(name = "RESOURCE")
+@Table(name = "RESOURCE_REQUEST")
 @Data
 @NoArgsConstructor
 @SuperBuilder
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class ResourcePersistenceEntity extends AbstractPersistenceEntity {
+public class ResourceRequestPersistenceEntity extends AbstractPersistenceEntity {
 
     @Column
-    private ResourceDomainModel.ResourceType type;
+    private ResourceRequestDomainModel.ResourceType type;
 
     @Column
     private Long id;
@@ -30,10 +30,10 @@ public class ResourcePersistenceEntity extends AbstractPersistenceEntity {
     private String reason;
 
     @Column
-    private ResourceDomainModel.Operation operation;
+    private ResourceRequestDomainModel.ResourceRequestOperation operation;
 
     @Column
-    private ResourceDomainModel.ResourceStatus status;
+    private ResourceRequestDomainModel.ResourceRequestStatus status;
 
     /**
      * we need this <a href="https://github.com/spring-projects/spring-data-relational/issues/574">ticket</a> to be completed
@@ -46,7 +46,7 @@ public class ResourcePersistenceEntity extends AbstractPersistenceEntity {
     public static class ResourcePersistenceEntityPk implements Serializable {
 
         @Column
-        private ResourceDomainModel.ResourceType type;
+        private ResourceRequestDomainModel.ResourceType type;
 
         @Column
         private Long id;

@@ -4,7 +4,7 @@ databaseChangeLog:
       author: harry
       changes:
         - createTable:
-            tableName: RESOURCE
+            tableName: RESOURCE_REQUEST
             columns:
               - column:
                   name: TYPE
@@ -67,16 +67,16 @@ databaseChangeLog:
             columns:
               - column:
                   name: TYPE
-            indexName: IDX_RESOURCE_TYPE
-            tableName: RESOURCE
+            indexName: IDX_RESOURCE_REQUEST_TYPE
+            tableName: RESOURCE_REQUEST
         - createIndex:
             columns:
               - column:
                   name: VERSION
-            indexName: IDX_RESOURCE_VERSION
-            tableName: RESOURCE
+            indexName: IDX_RESOURCE_REQUEST_VERSION
+            tableName: RESOURCE_REQUEST
         - createSequence:
-            sequenceName: USER_REQUEST_ID_SEQ
+            sequenceName: USER_RESOURCE_REQUEST_ID_SEQ
             cycle: true
             minValue: 1
             incrementBy: 1

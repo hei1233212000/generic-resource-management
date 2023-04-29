@@ -12,7 +12,7 @@ import poc.genericresourcemanagement.interfaces.rest.ResourceRouter;
 import poc.genericresourcemanagement.interfaces.rest.error.ErrorHandlingFunction;
 
 @Import({ResourceRouter.class})
-public class ResourceInterfaceConfig {
+public class InterfaceConfig {
     @Bean
     // give it a higher priority than the DefaultErrorWebExceptionHandler
     @Order(-2)

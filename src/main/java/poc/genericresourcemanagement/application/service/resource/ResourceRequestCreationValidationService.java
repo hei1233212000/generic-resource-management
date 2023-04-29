@@ -7,14 +7,14 @@ import poc.genericresourcemanagement.application.service.common.BeanValidationSe
 
 @RequiredArgsConstructor
 @Log4j2
-public class ResourceCreationValidationService {
+public class ResourceRequestCreationValidationService {
     private final BeanValidationService beanValidationService;
-    private final ResourceValidationService resourceValidationService;
+    private final ResourceRequestValidationService resourceRequestValidationService;
 
     public void validate(
             final CreateResourceRequest createResourceRequest
     ) {
         beanValidationService.validate(createResourceRequest);
-        resourceValidationService.validate(createResourceRequest.type(), createResourceRequest.content());
+        resourceRequestValidationService.validate(createResourceRequest.type(), createResourceRequest.content());
     }
 }

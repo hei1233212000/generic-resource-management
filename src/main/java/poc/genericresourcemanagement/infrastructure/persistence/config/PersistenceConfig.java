@@ -17,7 +17,7 @@ import java.util.List;
 @Import({
         LiquibaseR2dbcAutoConfiguration.class,
 })
-public class ResourcePersistenceConfig {
+public class PersistenceConfig {
     @Bean
     public R2dbcCustomConversions r2dbcCustomConversions(
             final ConnectionFactory connectionFactory,

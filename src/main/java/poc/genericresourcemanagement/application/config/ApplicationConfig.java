@@ -9,15 +9,15 @@ import poc.genericresourcemanagement.application.service.common.DefaultTimeGener
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.application.service.resource.*;
 import poc.genericresourcemanagement.application.service.resource.creator.ResourceCreator;
-import poc.genericresourcemanagement.application.service.resource.id.ResourceIdGenerator;
+import poc.genericresourcemanagement.application.service.resource.id.ResourceRequestIdGenerator;
 import poc.genericresourcemanagement.application.service.resource.validation.ResourceValidator;
-import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRepository;
+import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRequestRepository;
 
 import java.util.List;
 
 @Log4j2
 @Import({UserResourceApplicationConfig.class})
-public class ResourceApplicationConfig {
+public class ApplicationConfig {
     @Bean
     @ConditionalOnMissingBean
     TimeGenerator timeGenerator() {
@@ -26,38 +26,41 @@ public class ResourceApplicationConfig {
     }
 
     @Bean
-    ResourceService resourceService(
+    ResourceRequestService resourceRequestService(
             final TimeGenerator timeGenerator,
-            final ResourceRepository resourceRepository,
-            final ResourceIdGeneratorService resourceIdGeneratorService,
-            final ResourceCreationValidationService resourceCreationValidationService,
-            final ResourceValidationService resourceValidationService,
+            final ResourceRequestRepository resourceRequestRepository,
+            final ResourceRequestIdGeneratorService resourceRequestIdGeneratorService,
+            final ResourceRequestCreationValidationService resourceRequestCreationValidationService,
+            final ResourceRequestValidationService resourceRequestValidationService,
             final ResourceCreationService resourceCreationService
     ) {
-        return new ResourceService(
-                timeGenerator, resourceRepository, resourceIdGeneratorService, resourceCreationValidationService,
-                resourceValidationService, resourceCreationService
+        return new ResourceRequestService(
+                timeGenerator, resourceRequestRepository, resourceRequestIdGeneratorService,
+                resourceRequestCreationValidationService,
+                resourceRequestValidationService, resourceCreationService
         );
     }
 
     @Bean
-    ResourceIdGeneratorService resourceIdGeneratorService(
-            final List<ResourceIdGenerator> resourceIdGenerators
+    ResourceRequestIdGeneratorService resourceRequestIdGeneratorService(
+            final List<ResourceRequestIdGenerator> resourceRequestIdGenerators
     ) {
-        return new ResourceIdGeneratorService(resourceIdGenerators);
+        return new ResourceRequestIdGeneratorService(resourceRequestIdGenerators);
     }
 
     @Bean
-    ResourceCreationValidationService resourceCreationValidationService(
+    ResourceRequestCreationValidationService resourceRequestCreationValidationService(
             final BeanValidationService beanValidationService,
-            final ResourceValidationService resourceValidationService
+            final ResourceRequestValidationService resourceRequestValidationService
     ) {
-        return new ResourceCreationValidationService(beanValidationService, resourceValidationService);
+        return new ResourceRequestCreationValidationService(beanValidationService, resourceRequestValidationService);
     }
 
     @Bean
-    ResourceValidationService resourceValidationService(final List<ResourceValidator> resourceValidators) {
-        return new ResourceValidationService(resourceValidators);
+    ResourceRequestValidationService resourceRequestValidationService(
+            final List<ResourceValidator> resourceValidators
+    ) {
+        return new ResourceRequestValidationService(resourceValidators);
     }
 
     @Bean
