@@ -11,13 +11,11 @@ import lombok.extern.log4j.Log4j2;
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
 import poc.genericresourcemanagement.infrastructure.persistence.model.ResourceRequestPersistenceEntity;
-import poc.genericresourcemanagement.infrastructure.persistence.model.UserPersistenceEntity;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRequestRepository;
-import poc.genericresourcemanagement.infrastructure.persistence.repository.UserRepository;
+import poc.genericresourcemanagement.test.cucumber.common.Verifications;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
@@ -25,12 +23,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @Log4j2
 @SuppressWarnings("unused")
-public class ManageResourceSteps implements En {
+public class ResourceRequestSteps implements En {
     private Response response;
 
-    public ManageResourceSteps(
+    public ResourceRequestSteps(
             final ResourceRequestRepository resourceRequestRepository,
-            final UserRepository userRepository,
             final ObjectMapper objectMapper,
             final TimeGenerator timeGenerator
     ) {
@@ -59,7 +56,6 @@ public class ManageResourceSteps implements En {
                             .as("resource should be created")
                             .isNotNull();
                 });
-        Given("there is no USER exists", () -> assertThat(userRepository.count().block()).isZero());
 
         When("I query {resourceType} resource by request id {string}",
                 (ResourceRequestDomainModel.ResourceType resourceType, String requestId) -> response = when()
@@ -92,12 +88,12 @@ public class ManageResourceSteps implements En {
                 (ResourceRequestDomainModel.ResourceType resourceType, String requestId, DataTable dataTable) -> {
                     response = when().get("/resources/{resourceType}/{requestId}", resourceType, requestId);
                     final JsonNode actualResult = objectMapper.readTree(response.body().asString());
-                    verifyJsonNode(dataTable, actualResult);
+                    Verifications.verifyJsonNode(dataTable, actualResult);
                 });
         Then("the content of the resource response should be:", (DataTable dataTable) -> {
             final JsonNode responseNode = objectMapper.readTree(response.body().asString());
             final JsonNode actualResult = responseNode.get("content");
-            verifyJsonNode(dataTable, actualResult);
+            Verifications.verifyJsonNode(dataTable, actualResult);
         });
         Then("I got the error messages:", (DataTable dataTable) -> {
             final List<String> expectedErrorMessages = dataTable.asList();
@@ -110,26 +106,10 @@ public class ManageResourceSteps implements En {
 
             assertThat(actualErrorMessages).containsExactlyInAnyOrderElementsOf(expectedErrorMessages);
         });
-        Then("the USER {string} is persisted into the database with details:", (String username, DataTable dataTable) -> {
-            final UserPersistenceEntity user = userRepository.findByName(username).block();
-            log.info("user: {}", user);
-            assertThat(user).isNotNull();
-            verifyJsonNode(dataTable, objectMapper.valueToTree(user));
-        });
 
         ParameterType("resourceType", ".*",
                 (String resourceType) -> ResourceRequestDomainModel.ResourceType.valueOf(resourceType));
         ParameterType("resourceStatus", ".*",
                 (String resourceStatus) -> ResourceRequestDomainModel.ResourceRequestStatus.valueOf(resourceStatus));
-    }
-
-    private static void verifyJsonNode(final DataTable dataTable, final JsonNode actualResult) {
-        final Map<String, String> expectedResultMap = dataTable.asMap();
-        expectedResultMap.forEach((fieldName, expectedValue) -> {
-            assertThat(actualResult.has(fieldName))
-                    .as("the response body does not contain \"%s\"", fieldName)
-                    .isTrue();
-            assertThat(actualResult.get(fieldName).asText()).isEqualTo(expectedResultMap.get(fieldName));
-        });
     }
 }
