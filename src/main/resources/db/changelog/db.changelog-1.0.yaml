@@ -19,11 +19,6 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: VERSION
-                  type: bigint
-                  constraints:
-                    nullable: false
-              - column:
                   name: CONTENT
                   type: JSON
                   constraints:
@@ -36,6 +31,11 @@ databaseChangeLog:
               - column:
                   name: REASON
                   type: varchar(1000)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: VERSION
+                  type: bigint
                   constraints:
                     nullable: false
               - column:
@@ -64,8 +64,71 @@ databaseChangeLog:
                   name: TYPE
             indexName: IDX_RESOURCE_TYPE
             tableName: RESOURCE
+        - createIndex:
+            columns:
+              - column:
+                  name: VERSION
+            indexName: IDX_RESOURCE_VERSION
+            tableName: RESOURCE
         - createSequence:
             sequenceName: USER_REQUEST_ID_SEQ
+            cycle: true
+            minValue: 1
+            incrementBy: 1
+            ordered: true
+        - createTable:
+            tableName: MY_USER
+            columns:
+              - column:
+                  name: ID
+                  type: bigint
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: NAME
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: AGE
+                  type: integer
+                  constraints:
+                    nullable: false
+              - column:
+                  name: VERSION
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: CREATED_BY
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: CREATED_TIMESTAMP
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: UPDATED_BY
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: UPDATED_TIMESTAMP
+                  type: datetime
+                  constraints:
+                    nullable: false
+        - createIndex:
+            columns:
+              - column:
+                  name: VERSION
+            indexName: IDX_USER_VERSION
+            tableName: MY_USER
+        - createSequence:
+            sequenceName: USER_ID_SEQ
             cycle: true
             minValue: 1
             incrementBy: 1

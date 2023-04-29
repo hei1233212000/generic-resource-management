@@ -11,7 +11,9 @@ import lombok.extern.log4j.Log4j2;
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
 import poc.genericresourcemanagement.infrastructure.persistence.model.ResourcePersistenceEntity;
+import poc.genericresourcemanagement.infrastructure.persistence.model.UserPersistenceEntity;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRepository;
+import poc.genericresourcemanagement.infrastructure.persistence.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,6 +30,7 @@ public class ManageResourceSteps implements En {
 
     public ManageResourceSteps(
             final ResourceRepository resourceRepository,
+            final UserRepository userRepository,
             final ObjectMapper objectMapper,
             final TimeGenerator timeGenerator
     ) {
@@ -54,6 +57,8 @@ public class ManageResourceSteps implements En {
                             .as("resource should be created")
                             .isNotNull();
                 });
+        Given("there is no USER exists", () -> assertThat(userRepository.count().block()).isZero());
+
         When("I query {resourceType} resource by request id {string}",
                 (ResourceDomainModel.ResourceType resourceType, String requestId) -> response = when()
                         .get("/resources/{resourceType}/{requestId}", resourceType, requestId));
@@ -102,6 +107,12 @@ public class ManageResourceSteps implements En {
             );
 
             assertThat(actualErrorMessages).containsExactlyInAnyOrderElementsOf(expectedErrorMessages);
+        });
+        Then("the USER {string} is persisted into the database with details:", (String username, DataTable dataTable) -> {
+            final UserPersistenceEntity user = userRepository.findByName(username).block();
+            log.info("user: {}", user);
+            assertThat(user).isNotNull();
+            verifyJsonNode(dataTable, objectMapper.valueToTree(user));
         });
 
         ParameterType("resourceType", ".*",

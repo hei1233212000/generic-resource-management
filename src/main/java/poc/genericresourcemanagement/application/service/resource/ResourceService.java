@@ -23,6 +23,7 @@ public class ResourceService {
     private final ResourceIdGeneratorService resourceIdGeneratorService;
     private final ResourceCreationValidationService resourceCreationValidationService;
     private final ResourceValidationService resourceValidationService;
+    private final ResourceCreationService resourceCreationService;
 
     public Flux<ResourceDomainModel> findResourceDomainModelsByType(
             final ResourceDomainModel.ResourceType type
@@ -90,7 +91,15 @@ public class ResourceService {
                                 new IllegalStateException("failed to update with update count " + updatedCount));
                     }
                 })
-                .map(this::convert);
+                .map(this::convert)
+                .flatMap((ResourceDomainModel resource) -> {
+                    if (operation == Operation.APPROVE) {
+                        // TODO: how do we know it is a creation?
+                        return resourceCreationService.create(resource)
+                                .map(result -> resource);
+                    }
+                    return Mono.just(resource);
+                });
     }
 
     private Mono<ResourcePersistenceEntity> findResource(final ResourceDomainModel.ResourceType type, final long id) {

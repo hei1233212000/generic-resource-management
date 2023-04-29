@@ -2,14 +2,14 @@ Feature: Manage resource
 
   Background:
     Given the current time is "2023-02-03T12:34:56.123"
+    And there is no resource exist
+    And there is no USER exists
 
   Scenario: query USER resources
-    Given there is no resource exist
     When I query all USER resources
     Then the resource response is an empty array
 
   Scenario: create USER resource
-    Given there is no resource exist
     When I fire the create USER resource request as
     """
     {
@@ -43,12 +43,15 @@ Feature: Manage resource
       | version     | 1                       |
       | createdTime | 2023-02-03T12:34:56.123 |
       | updatedTime | 2023-02-03T23:00:00.000 |
-#    And the USER is persisted into the database with details:
-#      | name | Peter |
-#      | age  | 18    |
+    And the USER "Peter" is persisted into the database with details:
+      | id          | 1                       |
+      | name        | Peter                   |
+      | age         | 18                      |
+      | version     | 0                       |
+      | createdTime | 2023-02-03T23:00:00.000 |
+      | updatedTime | 2023-02-03T23:00:00.000 |
 
   Scenario: should able to cancel USER resource request
-    Given there is no resource exist
     And I create a PENDING_APPROVAL USER resource request "1" in DB with content
     """
     {
@@ -68,12 +71,10 @@ Feature: Manage resource
       | updatedTime | 2023-02-03T23:00:00.000 |
 
   Scenario: should have not found error when querying USER resource which does not exists
-    Given there is no resource exist
     When I query USER resource by request id "1"
     Then the resource request is failed with http status code 404
 
   Scenario Outline: should have not found error when approving or cancelling USER resource which does not exists
-    Given there is no resource exist
     When I <operation> the USER resource request "1"
     Then the resource request is failed with http status code 404
     Examples:
@@ -82,7 +83,6 @@ Feature: Manage resource
       | cancel    |
 
   Scenario Outline: should have validation error when approving or cancelling USER resource is not in pending approval status
-    Given there is no resource exist
     And I create a <originalRequestStatus> USER resource request "1" in DB with content
     """
     {
@@ -102,7 +102,6 @@ Feature: Manage resource
       | cancel    | CANCELLED             |
 
   Scenario: should have validation error when create resource with reason is not provided
-    Given there is no resource exist
     When I fire the create USER resource request as
     """
     {
@@ -118,7 +117,6 @@ Feature: Manage resource
       | 'reason' must not be blank |
 
   Scenario: should have validation error when create USER resource with user age is not provided
-    Given there is no resource exist
     When I fire the create USER resource request as
     """
     {
@@ -133,7 +131,6 @@ Feature: Manage resource
       | missing 'age' |
 
   Scenario: should perform validation on approval
-    Given there is no resource exist
     And I create a PENDING_APPROVAL USER resource request "1" in DB with content
     """
     {
@@ -146,7 +143,6 @@ Feature: Manage resource
       | missing 'age' |
 
   Scenario: should not perform validation on cancel
-    Given there is no resource exist
     And I create a PENDING_APPROVAL USER resource request "1" in DB with content
     """
     {

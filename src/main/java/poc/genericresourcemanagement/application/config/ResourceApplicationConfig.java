@@ -7,10 +7,8 @@ import org.springframework.context.annotation.Import;
 import poc.genericresourcemanagement.application.service.common.BeanValidationService;
 import poc.genericresourcemanagement.application.service.common.DefaultTimeGenerator;
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
-import poc.genericresourcemanagement.application.service.resource.ResourceCreationValidationService;
-import poc.genericresourcemanagement.application.service.resource.ResourceIdGeneratorService;
-import poc.genericresourcemanagement.application.service.resource.ResourceService;
-import poc.genericresourcemanagement.application.service.resource.ResourceValidationService;
+import poc.genericresourcemanagement.application.service.resource.*;
+import poc.genericresourcemanagement.application.service.resource.creator.ResourceCreator;
 import poc.genericresourcemanagement.application.service.resource.id.ResourceIdGenerator;
 import poc.genericresourcemanagement.application.service.resource.validation.ResourceValidator;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRepository;
@@ -33,11 +31,12 @@ public class ResourceApplicationConfig {
             final ResourceRepository resourceRepository,
             final ResourceIdGeneratorService resourceIdGeneratorService,
             final ResourceCreationValidationService resourceCreationValidationService,
-            final ResourceValidationService resourceValidationService
+            final ResourceValidationService resourceValidationService,
+            final ResourceCreationService resourceCreationService
     ) {
         return new ResourceService(
                 timeGenerator, resourceRepository, resourceIdGeneratorService, resourceCreationValidationService,
-                resourceValidationService
+                resourceValidationService, resourceCreationService
         );
     }
 
@@ -64,5 +63,10 @@ public class ResourceApplicationConfig {
     @Bean
     BeanValidationService beanValidationService(final jakarta.validation.Validator beanValidator) {
         return new BeanValidationService(beanValidator);
+    }
+
+    @Bean
+    ResourceCreationService resourceCreationService(final List<ResourceCreator> resourceCreators) {
+        return new ResourceCreationService(resourceCreators);
     }
 }

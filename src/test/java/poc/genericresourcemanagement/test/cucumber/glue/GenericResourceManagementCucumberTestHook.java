@@ -33,7 +33,7 @@ public class GenericResourceManagementCucumberTestHook implements LambdaGlue {
             log.info("going to set the current time to: {}", time);
 
             cleanUpDatabase(r2dbcRepositories);
-            resetDbSequence(r2dbcEntityTemplate);
+            resetDbSequencers(r2dbcEntityTemplate);
         });
 
         After(0, scenario -> RestAssured.reset());
@@ -46,12 +46,19 @@ public class GenericResourceManagementCucumberTestHook implements LambdaGlue {
         });
     }
 
-    private static void resetDbSequence(final R2dbcEntityTemplate r2dbcEntityTemplate) {
-        final String seq = "USER_REQUEST_ID_SEQ";
+    private static void resetDbSequencers(final R2dbcEntityTemplate r2dbcEntityTemplate) {
+        resetDbSequence(r2dbcEntityTemplate, "USER_REQUEST_ID_SEQ");
+        resetDbSequence(r2dbcEntityTemplate, "USER_ID_SEQ");
+    }
+
+    private static void resetDbSequence(
+            final R2dbcEntityTemplate r2dbcEntityTemplate,
+            final String sequenceName
+    ) {
         r2dbcEntityTemplate.getDatabaseClient()
-                .sql("ALTER SEQUENCE " + seq + " RESTART WITH 1")
+                .sql("ALTER SEQUENCE " + sequenceName + " RESTART WITH 1")
                 .then()
                 .block();
-        log.info("{} is reset", seq);
+        log.info("{} is reset", sequenceName);
     }
 }
