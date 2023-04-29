@@ -60,4 +60,4 @@ Feature: Manage USER
     """
     Then the resource request is failed with http status code 400
     And I got the error messages:
-      | missing 'age' |
+      | 'age' must not be null |

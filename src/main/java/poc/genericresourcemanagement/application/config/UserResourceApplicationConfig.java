@@ -2,6 +2,7 @@ package poc.genericresourcemanagement.application.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
+import poc.genericresourcemanagement.application.service.common.BeanValidationService;
 import poc.genericresourcemanagement.application.service.resource.creator.UserResourceCreator;
 import poc.genericresourcemanagement.application.service.resource.id.UserResourceRequestIdGenerator;
 import poc.genericresourcemanagement.application.service.resource.validation.UserResourceValidator;
@@ -17,8 +18,11 @@ public class UserResourceApplicationConfig {
     }
 
     @Bean
-    UserResourceValidator userResourceCreationValidator() {
-        return new UserResourceValidator();
+    UserResourceValidator userResourceCreationValidator(
+            final ObjectMapper objectMapper,
+            final BeanValidationService beanValidationService
+    ) {
+        return new UserResourceValidator(objectMapper, beanValidationService);
     }
 
     @Bean

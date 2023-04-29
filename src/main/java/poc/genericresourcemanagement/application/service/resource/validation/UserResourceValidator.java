@@ -1,15 +1,17 @@
 package poc.genericresourcemanagement.application.service.resource.validation;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import poc.genericresourcemanagement.application.error.ValidationErrorException;
+import poc.genericresourcemanagement.application.service.common.BeanValidationService;
 import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
-
-import java.util.ArrayList;
-import java.util.List;
+import poc.genericresourcemanagement.domain.model.UserDomainModel;
 
 @RequiredArgsConstructor
 public class UserResourceValidator implements ResourceValidator {
+    private final ObjectMapper objectMapper;
+    private final BeanValidationService beanValidationService;
+
     @Override
     public boolean isSupported(final ResourceRequestDomainModel.ResourceType resourceType) {
         return resourceType == ResourceRequestDomainModel.ResourceType.USER;
@@ -17,21 +19,7 @@ public class UserResourceValidator implements ResourceValidator {
 
     @Override
     public void validate(final JsonNode resource) {
-        final List<String> errorMessages = new ArrayList<>();
-        validateRequiredField(resource, "name", errorMessages);
-        validateRequiredField(resource, "age", errorMessages);
-        if(!errorMessages.isEmpty()) {
-            throw new ValidationErrorException(errorMessages);
-        }
-    }
-
-    private static void validateRequiredField(
-            final JsonNode resource,
-            final String field,
-            final List<String> errorMessages
-    ) {
-        if(!resource.has(field)) {
-            errorMessages.add(String.format("missing '%s'", field));
-        }
+        final UserDomainModel userDomainModel = objectMapper.convertValue(resource, UserDomainModel.class);
+        beanValidationService.validate(userDomainModel);
     }
 }

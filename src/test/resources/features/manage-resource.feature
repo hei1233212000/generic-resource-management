@@ -85,7 +85,7 @@ Feature: Manage resource
     When I approve the USER resource request "1"
     Then the resource request is failed with http status code 400
     And I got the error messages:
-      | missing 'age' |
+      | 'age' must not be null |
 
   Scenario: should not perform validation on cancel
     And I create a PENDING_APPROVAL USER resource request "1" in DB with content
