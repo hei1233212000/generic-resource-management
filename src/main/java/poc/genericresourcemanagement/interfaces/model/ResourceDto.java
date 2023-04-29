@@ -12,6 +12,7 @@ public record ResourceDto(
         Long id,
         JsonNode content,
         String reason,
+        ResourceDomainModel.Operation operation,
         ResourceDomainModel.ResourceStatus status,
         Long version,
         String createdBy,

@@ -45,6 +45,7 @@ public class ManageResourceSteps implements En {
                             .id(id)
                             .content(objectMapper.readTree(requestContent))
                             .reason("for testing")
+                            .operation(ResourceDomainModel.Operation.CREATE)
                             .status(resourceStatus)
                             .createdBy("testStep")
                             .createdTime(currentLocalDateTime)

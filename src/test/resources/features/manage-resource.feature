@@ -24,6 +24,7 @@ Feature: Manage resource
     And the query USER response by request id "1" should contain the base info:
       | type        | USER                    |
       | id          | 1                       |
+      | operation   | CREATE                  |
       | status      | PENDING_APPROVAL        |
       | reason      | This is a test          |
       | version     | 0                       |
@@ -65,6 +66,7 @@ Feature: Manage resource
     And the query USER response by request id "1" should contain the base info:
       | type        | USER                    |
       | id          | 1                       |
+      | operation   | CREATE                  |
       | status      | CANCELLED               |
       | version     | 1                       |
       | createdTime | 2023-02-03T12:34:56.123 |
@@ -155,6 +157,7 @@ Feature: Manage resource
     And the query USER response by request id "1" should contain the base info:
       | type        | USER                    |
       | id          | 1                       |
+      | operation   | CREATE                  |
       | status      | CANCELLED               |
       | version     | 1                       |
       | createdTime | 2023-02-03T12:34:56.123 |

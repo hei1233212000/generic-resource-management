@@ -11,6 +11,7 @@ public record ResourceDomainModel(
         Long id,
         JsonNode content,
         String reason,
+        Operation operation,
         ResourceDomainModel.ResourceStatus status,
         Long version,
         String createdBy,
@@ -24,5 +25,9 @@ public record ResourceDomainModel(
 
     public enum ResourceStatus {
         PENDING_APPROVAL, APPROVED, CANCELLED
+    }
+
+    public enum Operation {
+        CREATE
     }
 }

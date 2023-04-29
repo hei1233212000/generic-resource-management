@@ -30,6 +30,9 @@ public class ResourcePersistenceEntity extends AbstractPersistenceEntity {
     private String reason;
 
     @Column
+    private ResourceDomainModel.Operation operation;
+
+    @Column
     private ResourceDomainModel.ResourceStatus status;
 
     /**

@@ -115,6 +115,7 @@ public class ResourceRouter {
                 .id(resourceDomainModel.id())
                 .content(resourceDomainModel.content())
                 .reason(resourceDomainModel.reason())
+                .operation(resourceDomainModel.operation())
                 .status(resourceDomainModel.status())
                 .version(resourceDomainModel.version())
                 .createdBy(resourceDomainModel.createdBy())
