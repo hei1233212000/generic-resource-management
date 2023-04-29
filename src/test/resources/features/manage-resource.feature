@@ -2,14 +2,14 @@ Feature: Manage resource
 
   Background:
     Given the current time is "2023-02-03T12:34:56.123"
-    And there is no resource exist
+    And there is no resource request exist
     And there is no USER exists
 
-  Scenario: query USER resources
-    When I query all USER resources
+  Scenario: query USER resource requests
+    When I query all USER resource requests
     Then the resource response is an empty array
 
-  Scenario: create USER resource
+  Scenario: create USER
     When I fire the create USER resource request as
     """
     {
@@ -21,7 +21,7 @@ Feature: Manage resource
     }
     """
     Then the resource request is successfully processed with http status code 201
-    And the query USER response by request id "1" should contain the base info:
+    And the query USER request response by request id "1" should contain the base info:
       | type        | USER                    |
       | id          | 1                       |
       | operation   | CREATE                  |
@@ -37,7 +37,7 @@ Feature: Manage resource
     When the current time is "2023-02-03T23:00:00.000"
     And I approve the USER resource request "1"
     Then the resource request is successfully processed with http status code 200
-    And the approve USER response by request id "1" should contain the base info:
+    And the approve USER request response by request id "1" should contain the base info:
       | type        | USER                    |
       | id          | 1                       |
       | status      | APPROVED                |
@@ -63,7 +63,7 @@ Feature: Manage resource
     When the current time is "2023-02-03T23:00:00.000"
     And I cancel the USER resource request "1"
     Then the resource request is failed with http status code 200
-    And the query USER response by request id "1" should contain the base info:
+    And the query USER request response by request id "1" should contain the base info:
       | type        | USER                    |
       | id          | 1                       |
       | operation   | CREATE                  |
@@ -72,11 +72,11 @@ Feature: Manage resource
       | createdTime | 2023-02-03T12:34:56.123 |
       | updatedTime | 2023-02-03T23:00:00.000 |
 
-  Scenario: should have not found error when querying USER resource which does not exists
+  Scenario: should have not found error when querying USER resource request which does not exists
     When I query USER resource by request id "1"
     Then the resource request is failed with http status code 404
 
-  Scenario Outline: should have not found error when approving or cancelling USER resource which does not exists
+  Scenario Outline: should have not found error when approving or cancelling USER resource request which does not exists
     When I <operation> the USER resource request "1"
     Then the resource request is failed with http status code 404
     Examples:
@@ -84,7 +84,7 @@ Feature: Manage resource
       | approve   |
       | cancel    |
 
-  Scenario Outline: should have validation error when approving or cancelling USER resource is not in pending approval status
+  Scenario Outline: should have validation error when approving or cancelling USER resource request is not in pending approval status
     And I create a <originalRequestStatus> USER resource request "1" in DB with content
     """
     {
@@ -154,7 +154,7 @@ Feature: Manage resource
     When the current time is "2023-02-03T23:00:00.000"
     And I cancel the USER resource request "1"
     Then the resource request is failed with http status code 200
-    And the query USER response by request id "1" should contain the base info:
+    And the query USER request response by request id "1" should contain the base info:
       | type        | USER                    |
       | id          | 1                       |
       | operation   | CREATE                  |

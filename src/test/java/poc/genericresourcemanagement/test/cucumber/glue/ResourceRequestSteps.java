@@ -31,7 +31,7 @@ public class ResourceRequestSteps implements En {
             final ObjectMapper objectMapper,
             final TimeGenerator timeGenerator
     ) {
-        Given("there is no resource exist", () -> assertThat(resourceRequestRepository.count().block())
+        Given("there is no resource request exist", () -> assertThat(resourceRequestRepository.count().block())
                 .isZero());
         Given("I create a {resourceStatus} {resourceType} resource request {string} in DB with content",
                 (ResourceRequestDomainModel.ResourceRequestStatus resourceRequestStatus, ResourceRequestDomainModel.ResourceType resourceType, String requestId, String requestContent) -> {
@@ -60,7 +60,7 @@ public class ResourceRequestSteps implements En {
         When("I query {resourceType} resource by request id {string}",
                 (ResourceRequestDomainModel.ResourceType resourceType, String requestId) -> response = when()
                         .get("/resources/{resourceType}/{requestId}", resourceType, requestId));
-        When("I query all {resourceType} resources", (ResourceRequestDomainModel.ResourceType resourceType) -> response = when()
+        When("I query all {resourceType} resource requests", (ResourceRequestDomainModel.ResourceType resourceType) -> response = when()
                 .get("/resources/{resourceType}/", resourceType)
                 .then()
                 .statusCode(200)
@@ -84,7 +84,7 @@ public class ResourceRequestSteps implements En {
         });
         Then("the resource request is (successfully processed)(failed) with http status code {int}",
                 (Integer expectedHttpStatusCode) -> response.then().statusCode(expectedHttpStatusCode));
-        Then("the query/approve {resourceType} response by request id {string} should contain the base info:",
+        Then("the query/approve {resourceType} request response by request id {string} should contain the base info:",
                 (ResourceRequestDomainModel.ResourceType resourceType, String requestId, DataTable dataTable) -> {
                     response = when().get("/resources/{resourceType}/{requestId}", resourceType, requestId);
                     final JsonNode actualResult = objectMapper.readTree(response.body().asString());
