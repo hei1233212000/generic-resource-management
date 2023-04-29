@@ -54,7 +54,7 @@ public class ResourceRouter {
     ) {
         return resourceService.findResourceDomainModelsByType(extractResourceType(request))
                 .collectList()
-                .map(l -> l.stream().map(ResourceRouter::convert).collect(Collectors.toList()))
+                .map(l -> l.stream().map(ResourceRouter::convert2ResourceDto).collect(Collectors.toList()))
                 .flatMap(resources -> ServerResponse.ok()
                         .contentType(APPLICATION_JSON)
                         .body(BodyInserters.fromValue(resources))
@@ -69,7 +69,7 @@ public class ResourceRouter {
                         extractResourceType(request),
                         extractResourceRequestId(request)
                 )
-                .map(ResourceRouter::convert)
+                .map(ResourceRouter::convert2ResourceDto)
                 .flatMap(resource -> ServerResponse.ok()
                         .contentType(APPLICATION_JSON)
                         .body(BodyInserters.fromValue(resource))
@@ -86,7 +86,7 @@ public class ResourceRouter {
                         .createdBy("user")
                         .build())
                 .flatMap(resourceService::createResource)
-                .map(ResourceRouter::convert)
+                .map(ResourceRouter::convert2ResourceDto)
                 .flatMap(resource -> ServerResponse.status(HttpStatusCode.valueOf(201))
                         .contentType(APPLICATION_JSON)
                         .body(BodyInserters.fromValue(resource))
@@ -101,7 +101,7 @@ public class ResourceRouter {
         return resourceService.approveOrCancelResource(
                         extractResourceType(request), extractResourceRequestId(request), operation
                 )
-                .map(ResourceRouter::convert)
+                .map(ResourceRouter::convert2ResourceDto)
                 .flatMap(resource -> ServerResponse.status(HttpStatusCode.valueOf(200))
                         .contentType(APPLICATION_JSON)
                         .body(BodyInserters.fromValue(resource))
@@ -109,7 +109,7 @@ public class ResourceRouter {
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
 
-    private static ResourceDto convert(final ResourceDomainModel resourceDomainModel) {
+    private static ResourceDto convert2ResourceDto(final ResourceDomainModel resourceDomainModel) {
         return ResourceDto.builder()
                 .type(resourceDomainModel.type())
                 .id(resourceDomainModel.id())
