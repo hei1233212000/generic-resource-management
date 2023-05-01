@@ -7,9 +7,11 @@ import org.springframework.context.annotation.Import;
 import poc.genericresourcemanagement.application.service.common.BeanValidationService;
 import poc.genericresourcemanagement.application.service.common.DefaultTimeGenerator;
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
-import poc.genericresourcemanagement.application.service.resource.*;
+import poc.genericresourcemanagement.application.service.resource.ResourceCreationService;
+import poc.genericresourcemanagement.application.service.resource.ResourceRequestCreationValidationService;
+import poc.genericresourcemanagement.application.service.resource.ResourceRequestService;
+import poc.genericresourcemanagement.application.service.resource.ResourceRequestValidationService;
 import poc.genericresourcemanagement.application.service.resource.creator.ResourceCreator;
-import poc.genericresourcemanagement.application.service.resource.id.ResourceRequestIdGenerator;
 import poc.genericresourcemanagement.application.service.resource.validation.ResourceValidator;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRequestRepository;
 
@@ -32,23 +34,15 @@ public class ApplicationConfig {
     ResourceRequestService resourceRequestService(
             final TimeGenerator timeGenerator,
             final ResourceRequestRepository resourceRequestRepository,
-            final ResourceRequestIdGeneratorService resourceRequestIdGeneratorService,
             final ResourceRequestCreationValidationService resourceRequestCreationValidationService,
             final ResourceRequestValidationService resourceRequestValidationService,
             final ResourceCreationService resourceCreationService
     ) {
         return new ResourceRequestService(
-                timeGenerator, resourceRequestRepository, resourceRequestIdGeneratorService,
+                timeGenerator, resourceRequestRepository,
                 resourceRequestCreationValidationService,
                 resourceRequestValidationService, resourceCreationService
         );
-    }
-
-    @Bean
-    ResourceRequestIdGeneratorService resourceRequestIdGeneratorService(
-            final List<ResourceRequestIdGenerator> resourceRequestIdGenerators
-    ) {
-        return new ResourceRequestIdGeneratorService(resourceRequestIdGenerators);
     }
 
     @Bean

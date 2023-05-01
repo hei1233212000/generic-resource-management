@@ -13,18 +13,13 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDateTime;
 
 public interface ResourceRequestRepository extends
-        R2dbcRepository<ResourceRequestPersistenceEntity, ResourceRequestPersistenceEntity.ResourcePersistenceEntityPk> {
+        R2dbcRepository<ResourceRequestPersistenceEntity, ResourceRequestPersistenceEntity.ResourcePersistenceEntityPk>,
+        CustomResourceRequestRepository {
 
     Flux<ResourceRequestPersistenceEntity> findAllByType(final ResourceType type);
 
     // TODO: we need this because composite key still not suppoerted in Spring R2dbc
     Mono<ResourceRequestPersistenceEntity> findByTypeAndId(final ResourceType type, final long id);
-
-    @Query(value = "SELECT nextval('USER_RESOURCE_REQUEST_ID_SEQ')")
-    Mono<Long> findUserResourceRequestNextId();
-
-    @Query(value = "SELECT nextval('ACCOUNT_RESOURCE_REQUEST_ID_SEQ')")
-    Mono<Long> findAccountResourceRequestNextId();
 
     // TODO: we need this because composite key still not suppoerted in Spring R2dbc
     @Modifying

@@ -25,7 +25,6 @@ import java.util.function.Function;
 public class ResourceRequestService {
     private final TimeGenerator timeGenerator;
     private final ResourceRequestRepository resourceRequestRepository;
-    private final ResourceRequestIdGeneratorService resourceRequestIdGeneratorService;
     private final ResourceRequestCreationValidationService resourceRequestCreationValidationService;
     private final ResourceRequestValidationService resourceRequestValidationService;
     private final ResourceCreationService resourceCreationService;
@@ -48,7 +47,7 @@ public class ResourceRequestService {
             final CreateResourceRequest createResourceRequest
     ) {
         resourceRequestCreationValidationService.validate(createResourceRequest);
-        return resourceRequestIdGeneratorService.generateResourceRequestId(createResourceRequest.type())
+        return resourceRequestRepository.findNextResourceRequestId(createResourceRequest.type())
                 .map(newId -> convert2ResourceRequestPersistenceEntity(newId, createResourceRequest))
                 .flatMap(resourceRequestRepository::save)
                 .map(this::convert2ResourceRequestDomainModel);
