@@ -6,7 +6,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.transaction.annotation.Transactional;
 import poc.genericresourcemanagement.application.error.FailToChangeResourceRequestStatusException;
 import poc.genericresourcemanagement.application.model.CreateResourceRequest;
-import poc.genericresourcemanagement.application.model.Operation;
+import poc.genericresourcemanagement.application.model.RequestOperation;
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
 import poc.genericresourcemanagement.domain.model.ResourceType;
@@ -56,17 +56,17 @@ public class ResourceRequestService {
     public Mono<ResourceRequestDomainModel> approveOrCancelResourceRequest(
             final ResourceType type,
             final long resourceRequestId,
-            final Operation operation
+            final RequestOperation requestOperation
     ) {
         final String user = "approver";
         final LocalDateTime currentLocalDateTime = timeGenerator.currentLocalDateTime();
         return findResourceRequestPersistenceEntity(type, resourceRequestId)
-                .doOnNext(validateApproveOrCancelResourceRequest(operation))
-                .doOnNext(validateApproveOrCancelResourceRequestContent(operation))
-                .flatMap(createOrUpdateResource(operation, user, currentLocalDateTime))
-                .flatMap(updateResourceRequest(operation, user, currentLocalDateTime))
+                .doOnNext(validateApproveOrCancelResourceRequest(requestOperation))
+                .doOnNext(validateApproveOrCancelResourceRequestContent(requestOperation))
+                .flatMap(createOrUpdateResource(requestOperation, user, currentLocalDateTime))
+                .flatMap(updateResourceRequest(requestOperation, user, currentLocalDateTime))
                 .flatMap(convertApproveOrCancelResourceRequestResult2ResourceRequestDomainModel(
-                        type, resourceRequestId, operation
+                        type, resourceRequestId, requestOperation
                 ));
     }
 
@@ -84,11 +84,11 @@ public class ResourceRequestService {
     }
 
     private static Consumer<ResourceRequestPersistenceEntity> validateApproveOrCancelResourceRequest(
-            final Operation operation) {
+            final RequestOperation requestOperation) {
         return resourceRequest -> {
             if(resourceRequest.getStatus() != ResourceRequestDomainModel.ResourceRequestStatus.PENDING_APPROVAL) {
                 throw new FailToChangeResourceRequestStatusException(
-                        operation,
+                        requestOperation,
                         resourceRequest.getType(),
                         resourceRequest.getId(),
                         resourceRequest.getStatus()
@@ -98,20 +98,20 @@ public class ResourceRequestService {
     }
 
     private Consumer<ResourceRequestPersistenceEntity> validateApproveOrCancelResourceRequestContent(
-            final Operation operation
+            final RequestOperation requestOperation
     ) {
         return resourceRequest -> {
-            if(operation == Operation.APPROVE) {
+            if(requestOperation == RequestOperation.APPROVE) {
                 resourceRequestValidationService.validate(resourceRequest.getType(), resourceRequest.getContent());
             }
         };
     }
 
     private Function<ResourceRequestPersistenceEntity, Mono<ResourceRequestPersistenceEntity>> createOrUpdateResource(
-            final Operation operation, final String user, final LocalDateTime currentLocalDateTime
+            final RequestOperation requestOperation, final String user, final LocalDateTime currentLocalDateTime
     ) {
         return resourceRequest -> {
-            if(operation == Operation.APPROVE) {
+            if(requestOperation == RequestOperation.APPROVE) {
                 // TODO: how do we know it is a creation?
                 return resourceCreationService.create(
                                 resourceRequest.getType(), resourceRequest.getContent(), user, currentLocalDateTime
@@ -123,11 +123,11 @@ public class ResourceRequestService {
     }
 
     private Function<ResourceRequestPersistenceEntity, Mono<Integer>> updateResourceRequest(
-            final Operation operation, final String user, final LocalDateTime currentLocalDateTime
+            final RequestOperation requestOperation, final String user, final LocalDateTime currentLocalDateTime
     ) {
         return resourceRequest -> {
             final ResourceRequestDomainModel.ResourceRequestStatus resourceRequestStatus =
-                    operation == Operation.APPROVE
+                    requestOperation == RequestOperation.APPROVE
                             ? ResourceRequestDomainModel.ResourceRequestStatus.APPROVED
                             : ResourceRequestDomainModel.ResourceRequestStatus.CANCELLED;
             return resourceRequestRepository.updateStatus(
@@ -142,7 +142,7 @@ public class ResourceRequestService {
     }
 
     private Function<Integer, Mono<ResourceRequestDomainModel>> convertApproveOrCancelResourceRequestResult2ResourceRequestDomainModel(
-            final ResourceType type, final long resourceRequestId, final Operation operation
+            final ResourceType type, final long resourceRequestId, final RequestOperation requestOperation
     ) {
         return updatedCount -> {
             if(updatedCount == 1) {
@@ -150,7 +150,7 @@ public class ResourceRequestService {
             } else {
                 log.error(
                         "failed to update the resource where type: {}, resourceRequestId: {}, operation: {}, updatedCount: {}",
-                        type, resourceRequestId, operation, updatedCount
+                        type, resourceRequestId, requestOperation, updatedCount
                 );
                 return Mono.error(
                         new IllegalStateException("failed to approve or cancel the resource"));

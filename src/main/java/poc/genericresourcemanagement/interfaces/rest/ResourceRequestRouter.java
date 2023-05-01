@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import poc.genericresourcemanagement.application.model.CreateResourceRequest;
-import poc.genericresourcemanagement.application.model.Operation;
+import poc.genericresourcemanagement.application.model.RequestOperation;
 import poc.genericresourcemanagement.application.service.resource.ResourceRequestService;
 import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
 import poc.genericresourcemanagement.domain.model.ResourceType;
@@ -43,9 +43,9 @@ public class ResourceRequestRouter {
                         contentType(APPLICATION_JSON).and(accept(APPLICATION_JSON)),
                         request -> createResourceRequest(request, resourceRequestService))
                 .POST("/resource-requests/{type}/{id}/approve", accept(APPLICATION_JSON),
-                        request -> approveOrCancelResourceRequest(request, resourceRequestService, Operation.APPROVE))
+                        request -> approveOrCancelResourceRequest(request, resourceRequestService, RequestOperation.APPROVE))
                 .POST("/resource-requests/{type}/{id}/cancel", accept(APPLICATION_JSON),
-                        request -> approveOrCancelResourceRequest(request, resourceRequestService, Operation.CANCEL))
+                        request -> approveOrCancelResourceRequest(request, resourceRequestService, RequestOperation.CANCEL))
                 .build();
     }
 
@@ -99,10 +99,10 @@ public class ResourceRequestRouter {
     private Mono<ServerResponse> approveOrCancelResourceRequest(
             final ServerRequest request,
             final ResourceRequestService resourceRequestService,
-            final Operation operation
+            final RequestOperation requestOperation
     ) {
         return resourceRequestService.approveOrCancelResourceRequest(
-                        extractResourceType(request), extractResourceRequestId(request), operation
+                        extractResourceType(request), extractResourceRequestId(request), requestOperation
                 )
                 .map(ResourceRequestRouter::convert2ResourceRequestDto)
                 .flatMap(resourceRequest -> ServerResponse.status(HttpStatusCode.valueOf(200))

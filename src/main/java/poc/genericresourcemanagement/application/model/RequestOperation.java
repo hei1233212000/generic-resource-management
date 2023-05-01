@@ -1,5 +1,5 @@
 package poc.genericresourcemanagement.application.model;
 
-public enum Operation {
+public enum RequestOperation {
     APPROVE, CANCEL
 }

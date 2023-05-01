@@ -61,7 +61,7 @@ public class ErrorHandlingFunction extends AbstractErrorWebExceptionHandler {
         } else if(error instanceof final FailToChangeResourceRequestStatusException exception) {
             errorMessages = List.of(
                     String.format("cannot %s %s resource request with id '%s' because it is in '%s' state",
-                            exception.getOperation().name().toLowerCase(), exception.getResourceType(),
+                            exception.getRequestOperation().name().toLowerCase(), exception.getResourceType(),
                             exception.getResourceRequestId(), exception.getCurrentStatus()
                     )
             );
