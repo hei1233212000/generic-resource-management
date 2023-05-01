@@ -6,16 +6,16 @@ import poc.genericresourcemanagement.infrastructure.persistence.repository.Resou
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
-public class UserResourceRequestIdGenerator implements ResourceRequestIdGenerator {
+public class AccountResourceRequestIdGenerator implements ResourceRequestIdGenerator {
     private final ResourceRequestRepository resourceRequestRepository;
 
     @Override
     public boolean isSupported(final ResourceType resourceType) {
-        return resourceType == ResourceType.USER;
+        return resourceType == ResourceType.ACCOUNT;
     }
 
     @Override
     public Mono<Long> generateResourceRequestId() {
-        return resourceRequestRepository.findUserResourceRequestNextId();
+        return resourceRequestRepository.findAccountResourceRequestNextId();
     }
 }

@@ -81,6 +81,12 @@ databaseChangeLog:
             minValue: 1
             incrementBy: 1
             ordered: true
+        - createSequence:
+            sequenceName: ACCOUNT_RESOURCE_REQUEST_ID_SEQ
+            cycle: true
+            minValue: 1
+            incrementBy: 1
+            ordered: true
         - createTable:
             tableName: MY_USER
             columns:
@@ -138,3 +144,49 @@ databaseChangeLog:
             minValue: 1
             incrementBy: 1
             ordered: true
+        - createTable:
+            tableName: ACCOUNT
+            columns:
+              - column:
+                  name: ID
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: HOLDER
+                  type: varchar(255)
+              - column:
+                  name: AMOUNT
+                  type: numeric(19, 4)
+              - column:
+                  name: VERSION
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: CREATED_BY
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: CREATED_TIMESTAMP
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: UPDATED_BY
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: UPDATED_TIMESTAMP
+                  type: datetime
+                  constraints:
+                    nullable: false
+        - createIndex:
+            columns:
+              - column:
+                  name: VERSION
+            indexName: IDX_ACCOUNT_VERSION
+            tableName: ACCOUNT

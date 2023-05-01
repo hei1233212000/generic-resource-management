@@ -8,6 +8,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
+import poc.genericresourcemanagement.domain.model.ResourceType;
 import poc.genericresourcemanagement.test.cucumber.service.ManualTimeGenerator;
 
 import java.util.List;
@@ -47,7 +48,9 @@ public class GenericResourceManagementCucumberTestHook implements LambdaGlue {
     }
 
     private static void resetDbSequencers(final R2dbcEntityTemplate r2dbcEntityTemplate) {
-        resetDbSequence(r2dbcEntityTemplate, "USER_RESOURCE_REQUEST_ID_SEQ");
+        for(final ResourceType resourceType : ResourceType.values()) {
+            resetDbSequence(r2dbcEntityTemplate, resourceType + "_RESOURCE_REQUEST_ID_SEQ");
+        }
         resetDbSequence(r2dbcEntityTemplate, "USER_ID_SEQ");
     }
 

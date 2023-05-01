@@ -9,6 +9,7 @@ import poc.genericresourcemanagement.application.model.CreateResourceRequest;
 import poc.genericresourcemanagement.application.model.Operation;
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
+import poc.genericresourcemanagement.domain.model.ResourceType;
 import poc.genericresourcemanagement.infrastructure.persistence.model.ResourceRequestPersistenceEntity;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRequestRepository;
 import reactor.core.publisher.Flux;
@@ -30,14 +31,14 @@ public class ResourceRequestService {
     private final ResourceCreationService resourceCreationService;
 
     public Flux<ResourceRequestDomainModel> findResourceRequestDomainModelsByType(
-            final ResourceRequestDomainModel.ResourceType type
+            final ResourceType type
     ) {
         return resourceRequestRepository.findAllByType(type)
                 .map(this::convert2ResourceRequestDomainModel);
     }
 
     public Mono<ResourceRequestDomainModel> findResourceRequestDomainModelById(
-            final ResourceRequestDomainModel.ResourceType type,
+            final ResourceType type,
             final long id
     ) {
         return findResourceRequestDomainModel(type, id);
@@ -54,7 +55,7 @@ public class ResourceRequestService {
     }
 
     public Mono<ResourceRequestDomainModel> approveOrCancelResourceRequest(
-            final ResourceRequestDomainModel.ResourceType type,
+            final ResourceType type,
             final long resourceRequestId,
             final Operation operation
     ) {
@@ -71,14 +72,14 @@ public class ResourceRequestService {
     }
 
     private Mono<ResourceRequestDomainModel> findResourceRequestDomainModel(
-            final ResourceRequestDomainModel.ResourceType type, final long id
+            final ResourceType type, final long id
     ) {
         return findResourceRequestPersistenceEntity(type, id)
                 .map(this::convert2ResourceRequestDomainModel);
     }
 
     private Mono<ResourceRequestPersistenceEntity> findResourceRequestPersistenceEntity(
-            final ResourceRequestDomainModel.ResourceType type, final long id
+            final ResourceType type, final long id
     ) {
         return resourceRequestRepository.findByTypeAndId(type, id);
     }
@@ -142,7 +143,7 @@ public class ResourceRequestService {
     }
 
     private Function<Integer, Mono<ResourceRequestDomainModel>> convertApproveOrCancelResourceRequestResult2ResourceRequestDomainModel(
-            final ResourceRequestDomainModel.ResourceType type, final long resourceRequestId, final Operation operation
+            final ResourceType type, final long resourceRequestId, final Operation operation
     ) {
         return updatedCount -> {
             if(updatedCount == 1) {

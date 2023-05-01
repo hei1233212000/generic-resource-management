@@ -10,6 +10,7 @@ import io.restassured.response.Response;
 import lombok.extern.log4j.Log4j2;
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
+import poc.genericresourcemanagement.domain.model.ResourceType;
 import poc.genericresourcemanagement.infrastructure.persistence.model.ResourceRequestPersistenceEntity;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRequestRepository;
 import poc.genericresourcemanagement.test.cucumber.common.Verifications;
@@ -34,7 +35,7 @@ public class ResourceRequestSteps implements En {
         Given("there is no resource request exist", () -> assertThat(resourceRequestRepository.count().block())
                 .isZero());
         Given("I create a {resourceStatus} {resourceType} resource request {string} in DB with content",
-                (ResourceRequestDomainModel.ResourceRequestStatus resourceRequestStatus, ResourceRequestDomainModel.ResourceType resourceType, String requestId, String requestContent) -> {
+                (ResourceRequestDomainModel.ResourceRequestStatus resourceRequestStatus, ResourceType resourceType, String requestId, String requestContent) -> {
                     final LocalDateTime currentLocalDateTime = timeGenerator.currentLocalDateTime();
                     final long id = Long.parseLong(requestId);
                     final ResourceRequestPersistenceEntity resourceRequestPersistenceEntity = ResourceRequestPersistenceEntity.builder()
@@ -58,21 +59,21 @@ public class ResourceRequestSteps implements En {
                 });
 
         When("I query {resourceType} resource by request id {string}",
-                (ResourceRequestDomainModel.ResourceType resourceType, String requestId) -> response = when()
+                (ResourceType resourceType, String requestId) -> response = when()
                         .get("/resources/{resourceType}/{requestId}", resourceType, requestId));
-        When("I query all {resourceType} resource requests", (ResourceRequestDomainModel.ResourceType resourceType) -> response = when()
+        When("I query all {resourceType} resource requests", (ResourceType resourceType) -> response = when()
                 .get("/resources/{resourceType}/", resourceType)
                 .then()
                 .statusCode(200)
                 .extract().response());
         When("I fire the create {resourceType} resource request as",
-                (ResourceRequestDomainModel.ResourceType resourceType, String requestBody) -> response = given()
+                (ResourceType resourceType, String requestBody) -> response = given()
                         .contentType(ContentType.JSON)
                         .body(requestBody)
                         .when()
                         .post("/resources/{resourceType}/", resourceType));
         When("I {} the {resourceType} resource request {string}",
-                (String requestType, ResourceRequestDomainModel.ResourceType resourceType, String requestId) -> response = given()
+                (String requestType, ResourceType resourceType, String requestId) -> response = given()
                         .post("/resources/{resourceType}/{requestId}/{requestType}", resourceType, requestId, requestType));
 
         Then("the resource response is an empty array", () -> {
@@ -85,7 +86,7 @@ public class ResourceRequestSteps implements En {
         Then("the resource request is (successfully processed)(failed) with http status code {int}",
                 (Integer expectedHttpStatusCode) -> response.then().statusCode(expectedHttpStatusCode));
         Then("the query/approve {resourceType} request response by request id {string} should contain the base info:",
-                (ResourceRequestDomainModel.ResourceType resourceType, String requestId, DataTable dataTable) -> {
+                (ResourceType resourceType, String requestId, DataTable dataTable) -> {
                     response = when().get("/resources/{resourceType}/{requestId}", resourceType, requestId);
                     final JsonNode actualResult = objectMapper.readTree(response.body().asString());
                     Verifications.verifyJsonNode(dataTable, actualResult);
@@ -108,7 +109,7 @@ public class ResourceRequestSteps implements En {
         });
 
         ParameterType("resourceType", ".*",
-                (String resourceType) -> ResourceRequestDomainModel.ResourceType.valueOf(resourceType));
+                (String resourceType) -> ResourceType.valueOf(resourceType));
         ParameterType("resourceStatus", ".*",
                 (String resourceStatus) -> ResourceRequestDomainModel.ResourceRequestStatus.valueOf(resourceStatus));
     }

@@ -48,7 +48,7 @@ Feature: Manage USER
       | createdTime | 2023-02-03T23:00:00.000 |
       | updatedTime | 2023-02-03T23:00:00.000 |
 
-  Scenario: should have validation error when create USER resource with user age is not provided
+  Scenario: should have validation error when create USER resource without user age
     When I fire the create USER resource request as
     """
     {

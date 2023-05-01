@@ -19,10 +19,6 @@ public record ResourceRequestDomainModel(
         String updatedBy,
         LocalDateTime updatedTime
 ) {
-    public enum ResourceType {
-        USER
-    }
-
     public enum ResourceRequestStatus {
         PENDING_APPROVAL, APPROVED, CANCELLED
     }

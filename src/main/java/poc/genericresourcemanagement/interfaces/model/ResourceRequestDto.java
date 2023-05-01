@@ -3,12 +3,13 @@ package poc.genericresourcemanagement.interfaces.model;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Builder;
 import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
+import poc.genericresourcemanagement.domain.model.ResourceType;
 
 import java.time.LocalDateTime;
 
 @Builder
 public record ResourceRequestDto(
-        ResourceRequestDomainModel.ResourceType type,
+        ResourceType type,
         Long id,
         JsonNode content,
         String reason,

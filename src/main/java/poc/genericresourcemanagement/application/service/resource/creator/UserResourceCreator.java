@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
+import poc.genericresourcemanagement.domain.model.ResourceType;
 import poc.genericresourcemanagement.infrastructure.persistence.model.UserPersistenceEntity;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.UserRepository;
 import reactor.core.publisher.Mono;
@@ -18,8 +18,8 @@ public class UserResourceCreator implements ResourceCreator {
     private final ObjectMapper objectMapper;
 
     @Override
-    public boolean isSupported(final ResourceRequestDomainModel.ResourceType resourceType) {
-        return resourceType == ResourceRequestDomainModel.ResourceType.USER;
+    public boolean isSupported(final ResourceType resourceType) {
+        return resourceType == ResourceType.USER;
     }
 
     @Override

@@ -16,7 +16,10 @@ import poc.genericresourcemanagement.infrastructure.persistence.repository.Resou
 import java.util.List;
 
 @Log4j2
-@Import({UserResourceApplicationConfig.class})
+@Import({
+        UserResourceApplicationConfig.class,
+        AccountResourceApplicationConfig.class
+})
 public class ApplicationConfig {
     @Bean
     @ConditionalOnMissingBean

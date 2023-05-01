@@ -12,6 +12,7 @@ import poc.genericresourcemanagement.application.model.CreateResourceRequest;
 import poc.genericresourcemanagement.application.model.Operation;
 import poc.genericresourcemanagement.application.service.resource.ResourceRequestService;
 import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
+import poc.genericresourcemanagement.domain.model.ResourceType;
 import poc.genericresourcemanagement.interfaces.model.CreateResourceRequestDto;
 import poc.genericresourcemanagement.interfaces.model.ResourceRequestDto;
 import reactor.core.publisher.Mono;
@@ -128,8 +129,8 @@ public class ResourceRouter {
                 .build();
     }
 
-    private static ResourceRequestDomainModel.ResourceType extractResourceType(final ServerRequest request) {
-        return ResourceRequestDomainModel.ResourceType.valueOf(request.pathVariable("type"));
+    private static ResourceType extractResourceType(final ServerRequest request) {
+        return ResourceType.valueOf(request.pathVariable("type"));
     }
 
     private static long extractResourceRequestId(final ServerRequest request) {

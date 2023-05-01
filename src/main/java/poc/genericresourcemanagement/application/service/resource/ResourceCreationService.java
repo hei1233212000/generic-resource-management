@@ -3,7 +3,7 @@ package poc.genericresourcemanagement.application.service.resource;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import poc.genericresourcemanagement.application.service.resource.creator.ResourceCreator;
-import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
+import poc.genericresourcemanagement.domain.model.ResourceType;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -14,7 +14,7 @@ public class ResourceCreationService {
     private final List<ResourceCreator> resourceCreators;
 
     public Mono<Boolean> create(
-            final ResourceRequestDomainModel.ResourceType resourceType,
+            final ResourceType resourceType,
             final JsonNode content,
             final String user,
             final LocalDateTime currentLocalDateTime

@@ -6,6 +6,7 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
+import poc.genericresourcemanagement.domain.model.ResourceType;
 
 import java.io.Serializable;
 
@@ -18,7 +19,7 @@ import java.io.Serializable;
 public class ResourceRequestPersistenceEntity extends AbstractPersistenceEntity {
 
     @Column
-    private ResourceRequestDomainModel.ResourceType type;
+    private ResourceType type;
 
     @Column
     private Long id;
@@ -46,7 +47,7 @@ public class ResourceRequestPersistenceEntity extends AbstractPersistenceEntity 
     public static class ResourcePersistenceEntityPk implements Serializable {
 
         @Column
-        private ResourceRequestDomainModel.ResourceType type;
+        private ResourceType type;
 
         @Column
         private Long id;
