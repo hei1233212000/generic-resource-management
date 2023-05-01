@@ -22,7 +22,7 @@ public class AccountResourceApplicationConfig {
             final AccountRepository accountRepository,
             final ObjectMapper objectMapper
     ) {
-        return new AccountResourceCreator(accountRepository, objectMapper);
+        return new AccountResourceCreator(objectMapper, accountRepository);
     }
 
     @Bean

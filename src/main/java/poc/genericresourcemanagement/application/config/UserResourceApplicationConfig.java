@@ -30,6 +30,6 @@ public class UserResourceApplicationConfig {
             final UserRepository userRepository,
             final ObjectMapper objectMapper
     ) {
-        return new UserResourceCreator(userRepository, objectMapper);
+        return new UserResourceCreator(objectMapper, userRepository);
     }
 }
