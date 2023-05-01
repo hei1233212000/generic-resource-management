@@ -1,0 +1,9 @@
+= TODO
+- Update function
+- Optimistic locking for update
+- Pagination
+- OpenAPI
+- Auth.
+- Resource API (including download)
+- Import CSV for batch creation
+- Update the API to support Batch update
