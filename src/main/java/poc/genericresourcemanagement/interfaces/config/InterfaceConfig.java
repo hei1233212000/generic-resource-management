@@ -8,10 +8,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.codec.ServerCodecConfigurer;
-import poc.genericresourcemanagement.interfaces.rest.ResourceRouter;
+import poc.genericresourcemanagement.interfaces.rest.ResourceRequestRouter;
 import poc.genericresourcemanagement.interfaces.rest.error.ErrorHandlingFunction;
 
-@Import({ResourceRouter.class})
+@Import({ResourceRequestRouter.class})
 public class InterfaceConfig {
     @Bean
     // give it a higher priority than the DefaultErrorWebExceptionHandler

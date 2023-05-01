@@ -24,27 +24,27 @@ import static org.springframework.web.reactive.function.server.RequestPredicates
 import static org.springframework.web.reactive.function.server.RequestPredicates.contentType;
 
 @Log4j2
-public class ResourceRouter {
+public class ResourceRequestRouter {
     @Bean
     RouterFunction<ServerResponse> resourceRequestRoutes(
             final ResourceRequestService resourceRequestService
     ) {
         return RouterFunctions.route()
-                .GET("/resources/{type}/{id}", accept(APPLICATION_JSON),
+                .GET("/resource-requests/{type}/{id}", accept(APPLICATION_JSON),
                         request -> getResourceRequest(request, resourceRequestService))
-                .GET("/resources/{type}/", accept(APPLICATION_JSON),
+                .GET("/resource-requests/{type}/", accept(APPLICATION_JSON),
                         request -> getResourceRequests(request, resourceRequestService))
-                .GET("/resources/{type}", accept(APPLICATION_JSON),
+                .GET("/resource-requests/{type}", accept(APPLICATION_JSON),
                         request -> getResourceRequests(request, resourceRequestService))
-                .POST("/resources/{type}/",
+                .POST("/resource-requests/{type}/",
                         contentType(APPLICATION_JSON).and(accept(APPLICATION_JSON)),
                         request -> createResourceRequest(request, resourceRequestService))
-                .POST("/resources/{type}",
+                .POST("/resource-requests/{type}",
                         contentType(APPLICATION_JSON).and(accept(APPLICATION_JSON)),
                         request -> createResourceRequest(request, resourceRequestService))
-                .POST("/resources/{type}/{id}/approve", accept(APPLICATION_JSON),
+                .POST("/resource-requests/{type}/{id}/approve", accept(APPLICATION_JSON),
                         request -> approveOrCancelResourceRequest(request, resourceRequestService, Operation.APPROVE))
-                .POST("/resources/{type}/{id}/cancel", accept(APPLICATION_JSON),
+                .POST("/resource-requests/{type}/{id}/cancel", accept(APPLICATION_JSON),
                         request -> approveOrCancelResourceRequest(request, resourceRequestService, Operation.CANCEL))
                 .build();
     }
@@ -55,7 +55,8 @@ public class ResourceRouter {
     ) {
         return resourceRequestService.findResourceRequestDomainModelsByType(extractResourceType(request))
                 .collectList()
-                .map(l -> l.stream().map(ResourceRouter::convert2ResourceRequestDto).collect(Collectors.toList()))
+                .map(l -> l.stream().map(ResourceRequestRouter::convert2ResourceRequestDto)
+                        .collect(Collectors.toList()))
                 .flatMap(resourceRequests -> ServerResponse.ok()
                         .contentType(APPLICATION_JSON)
                         .body(BodyInserters.fromValue(resourceRequests))
@@ -70,7 +71,7 @@ public class ResourceRouter {
                         extractResourceType(request),
                         extractResourceRequestId(request)
                 )
-                .map(ResourceRouter::convert2ResourceRequestDto)
+                .map(ResourceRequestRouter::convert2ResourceRequestDto)
                 .flatMap(resourceRequest -> ServerResponse.ok()
                         .contentType(APPLICATION_JSON)
                         .body(BodyInserters.fromValue(resourceRequest))
@@ -88,7 +89,7 @@ public class ResourceRouter {
                         .createdBy("user")
                         .build())
                 .flatMap(resourceRequestService::createResourceRequest)
-                .map(ResourceRouter::convert2ResourceRequestDto)
+                .map(ResourceRequestRouter::convert2ResourceRequestDto)
                 .flatMap(resourceRequest -> ServerResponse.status(HttpStatusCode.valueOf(201))
                         .contentType(APPLICATION_JSON)
                         .body(BodyInserters.fromValue(resourceRequest))
@@ -103,7 +104,7 @@ public class ResourceRouter {
         return resourceRequestService.approveOrCancelResourceRequest(
                         extractResourceType(request), extractResourceRequestId(request), operation
                 )
-                .map(ResourceRouter::convert2ResourceRequestDto)
+                .map(ResourceRequestRouter::convert2ResourceRequestDto)
                 .flatMap(resourceRequest -> ServerResponse.status(HttpStatusCode.valueOf(200))
                         .contentType(APPLICATION_JSON)
                         .body(BodyInserters.fromValue(resourceRequest))

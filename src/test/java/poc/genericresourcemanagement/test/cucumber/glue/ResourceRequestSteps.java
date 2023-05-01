@@ -60,9 +60,9 @@ public class ResourceRequestSteps implements En {
 
         When("I query {resourceType} resource by request id {string}",
                 (ResourceType resourceType, String requestId) -> response = when()
-                        .get("/resources/{resourceType}/{requestId}", resourceType, requestId));
+                        .get("/resource-requests/{resourceType}/{requestId}", resourceType, requestId));
         When("I query all {resourceType} resource requests", (ResourceType resourceType) -> response = when()
-                .get("/resources/{resourceType}/", resourceType)
+                .get("/resource-requests/{resourceType}/", resourceType)
                 .then()
                 .statusCode(200)
                 .extract().response());
@@ -71,10 +71,10 @@ public class ResourceRequestSteps implements En {
                         .contentType(ContentType.JSON)
                         .body(requestBody)
                         .when()
-                        .post("/resources/{resourceType}/", resourceType));
+                        .post("/resource-requests/{resourceType}/", resourceType));
         When("I {} the {resourceType} resource request {string}",
                 (String requestType, ResourceType resourceType, String requestId) -> response = given()
-                        .post("/resources/{resourceType}/{requestId}/{requestType}", resourceType, requestId, requestType));
+                        .post("/resource-requests/{resourceType}/{requestId}/{requestType}", resourceType, requestId, requestType));
 
         Then("the resource response is an empty array", () -> {
             final JsonNode jsonNode = objectMapper.readTree(response.body().asString());
@@ -87,7 +87,7 @@ public class ResourceRequestSteps implements En {
                 (Integer expectedHttpStatusCode) -> response.then().statusCode(expectedHttpStatusCode));
         Then("the query/approve {resourceType} request response by request id {string} should contain the base info:",
                 (ResourceType resourceType, String requestId, DataTable dataTable) -> {
-                    response = when().get("/resources/{resourceType}/{requestId}", resourceType, requestId);
+                    response = when().get("/resource-requests/{resourceType}/{requestId}", resourceType, requestId);
                     final JsonNode actualResult = objectMapper.readTree(response.body().asString());
                     Verifications.verifyJsonNode(dataTable, actualResult);
                 });
