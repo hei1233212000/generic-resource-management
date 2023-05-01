@@ -34,22 +34,23 @@ public class ResourceRequestSteps implements En {
     ) {
         Given("there is no resource request exist", () -> assertThat(resourceRequestRepository.count().block())
                 .isZero());
-        Given("I create a {resourceStatus} {resourceType} resource request {string} in DB with content",
+        Given("I create a {resourceRequestStatus} {resourceType} resource request {string} in DB with content",
                 (ResourceRequestDomainModel.ResourceRequestStatus resourceRequestStatus, ResourceType resourceType, String requestId, String requestContent) -> {
                     final LocalDateTime currentLocalDateTime = timeGenerator.currentLocalDateTime();
                     final long id = Long.parseLong(requestId);
-                    final ResourceRequestPersistenceEntity resourceRequestPersistenceEntity = ResourceRequestPersistenceEntity.builder()
-                            .type(resourceType)
-                            .id(id)
-                            .content(objectMapper.readTree(requestContent))
-                            .reason("for testing")
-                            .operation(ResourceRequestDomainModel.ResourceRequestOperation.CREATE)
-                            .status(resourceRequestStatus)
-                            .createdBy("testStep")
-                            .createdTime(currentLocalDateTime)
-                            .updatedBy("testStep")
-                            .updatedTime(currentLocalDateTime)
-                            .build();
+                    final ResourceRequestPersistenceEntity resourceRequestPersistenceEntity =
+                            ResourceRequestPersistenceEntity.builder()
+                                    .type(resourceType)
+                                    .id(id)
+                                    .content(objectMapper.readTree(requestContent))
+                                    .reason("for testing")
+                                    .operation(ResourceRequestDomainModel.ResourceRequestOperation.CREATE)
+                                    .status(resourceRequestStatus)
+                                    .createdBy("testStep")
+                                    .createdTime(currentLocalDateTime)
+                                    .updatedBy("testStep")
+                                    .updatedTime(currentLocalDateTime)
+                                    .build();
                     resourceRequestRepository.save(resourceRequestPersistenceEntity).block();
                     final ResourceRequestPersistenceEntity
                             resource = resourceRequestRepository.findByTypeAndId(resourceType, id).block();
@@ -74,7 +75,8 @@ public class ResourceRequestSteps implements En {
                         .post("/resource-requests/{resourceType}/", resourceType));
         When("I {} the {resourceType} resource request {string}",
                 (String requestType, ResourceType resourceType, String requestId) -> response = given()
-                        .post("/resource-requests/{resourceType}/{requestId}/{requestType}", resourceType, requestId, requestType));
+                        .post("/resource-requests/{resourceType}/{requestId}/{requestType}", resourceType, requestId,
+                                requestType));
 
         Then("the resource response is an empty array", () -> {
             final JsonNode jsonNode = objectMapper.readTree(response.body().asString());
@@ -110,7 +112,8 @@ public class ResourceRequestSteps implements En {
 
         ParameterType("resourceType", ".*",
                 (String resourceType) -> ResourceType.valueOf(resourceType));
-        ParameterType("resourceStatus", ".*",
-                (String resourceStatus) -> ResourceRequestDomainModel.ResourceRequestStatus.valueOf(resourceStatus));
+        ParameterType("resourceRequestStatus", ".*",
+                (String resourceRequestStatus) ->
+                        ResourceRequestDomainModel.ResourceRequestStatus.valueOf(resourceRequestStatus));
     }
 }
