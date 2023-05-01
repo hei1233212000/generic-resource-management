@@ -19,7 +19,7 @@ public class AccountResourceCreator
     }
 
     @Override
-    protected Class<AccountPersistenceEntity> getResourceClass() {
+    protected Class<AccountPersistenceEntity> getResourcePersistenceEntityClass() {
         return AccountPersistenceEntity.class;
     }
 

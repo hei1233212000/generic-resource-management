@@ -12,13 +12,13 @@ import java.time.LocalDateTime;
 public abstract class AbstractResourceCreator<R extends AbstractPersistenceEntity> implements ResourceCreator {
     private final ObjectMapper objectMapper;
 
-    protected abstract Class<R> getResourceClass();
+    protected abstract Class<R> getResourcePersistenceEntityClass();
 
     protected abstract Mono<Boolean> create(R resource);
 
     @Override
     public final Mono<Boolean> create(final JsonNode content, final String createdBy, final LocalDateTime createdTime) {
-        final R resource = objectMapper.convertValue(content, getResourceClass());
+        final R resource = objectMapper.convertValue(content, getResourcePersistenceEntityClass());
         resource.setCreatedBy(createdBy);
         resource.setCreatedTime(createdTime);
         resource.setUpdatedBy(createdBy);

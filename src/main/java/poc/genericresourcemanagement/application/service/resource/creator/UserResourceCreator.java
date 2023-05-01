@@ -18,7 +18,7 @@ public class UserResourceCreator extends AbstractResourceCreator<UserPersistence
     }
 
     @Override
-    protected Class<UserPersistenceEntity> getResourceClass() {
+    protected Class<UserPersistenceEntity> getResourcePersistenceEntityClass() {
         return UserPersistenceEntity.class;
     }
 
