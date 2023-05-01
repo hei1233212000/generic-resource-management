@@ -1,18 +1,13 @@
 package poc.genericresourcemanagement.application.service.resource.id;
 
 import lombok.RequiredArgsConstructor;
-import poc.genericresourcemanagement.domain.model.ResourceType;
+import poc.genericresourcemanagement.application.service.common.AccountComponent;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRequestRepository;
 import reactor.core.publisher.Mono;
 
 @RequiredArgsConstructor
-public class AccountResourceRequestIdGenerator implements ResourceRequestIdGenerator {
+public class AccountResourceRequestIdGenerator implements ResourceRequestIdGenerator, AccountComponent {
     private final ResourceRequestRepository resourceRequestRepository;
-
-    @Override
-    public boolean isSupported(final ResourceType resourceType) {
-        return resourceType == ResourceType.ACCOUNT;
-    }
 
     @Override
     public Mono<Long> generateResourceRequestId() {

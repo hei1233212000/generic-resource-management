@@ -4,18 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import poc.genericresourcemanagement.application.service.common.BeanValidationService;
-import poc.genericresourcemanagement.domain.model.ResourceType;
+import poc.genericresourcemanagement.application.service.common.UserComponent;
 import poc.genericresourcemanagement.domain.model.UserDomainModel;
 
 @RequiredArgsConstructor
-public class UserResourceValidator implements ResourceValidator {
+public class UserResourceValidator implements ResourceValidator, UserComponent {
     private final ObjectMapper objectMapper;
     private final BeanValidationService beanValidationService;
-
-    @Override
-    public boolean isSupported(final ResourceType resourceType) {
-        return resourceType == ResourceType.USER;
-    }
 
     @Override
     public void validate(final JsonNode resource) {
