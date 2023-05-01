@@ -1,20 +1,23 @@
 package poc.genericresourcemanagement.application.service.resource.validation;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
 import poc.genericresourcemanagement.application.service.common.AccountComponent;
 import poc.genericresourcemanagement.application.service.common.BeanValidationService;
 import poc.genericresourcemanagement.domain.model.AccountDomainModel;
 
-@RequiredArgsConstructor
-public class AccountResourceValidator implements ResourceValidator, AccountComponent {
-    private final ObjectMapper objectMapper;
-    private final BeanValidationService beanValidationService;
+public class AccountResourceValidator
+        extends AbstractResourceValidator<AccountDomainModel>
+        implements AccountComponent {
+
+    public AccountResourceValidator(
+            final ObjectMapper objectMapper,
+            final BeanValidationService beanValidationService
+    ) {
+        super(objectMapper, beanValidationService);
+    }
 
     @Override
-    public void validate(final JsonNode resource) {
-        final AccountDomainModel accountDomainModel = objectMapper.convertValue(resource, AccountDomainModel.class);
-        beanValidationService.validate(accountDomainModel);
+    protected Class<AccountDomainModel> getResourceDomainModelClass() {
+        return AccountDomainModel.class;
     }
 }
