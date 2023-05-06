@@ -68,3 +68,8 @@ Feature: Manage USER
     Then the resource request is failed with http status code 400
     And I got the error messages:
       | 'age' must not be null |
+
+  Scenario: should have validation error when we are not using numeric id to query user
+    When I query USER resource by id "not-a-number"
+    Then the query resource is failed with http status code 400 with error messages:
+      | 'not-a-number' is not a number |

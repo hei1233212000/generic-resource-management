@@ -44,7 +44,8 @@ public class ResourceHandler implements ApiHandler {
                 .flatMap(resourceRequests -> ServerResponse.ok()
                         .contentType(APPLICATION_JSON)
                         .body(BodyInserters.fromValue(resourceRequests))
-                );
+                )
+                .switchIfEmpty(ServerResponse.notFound().build());
     }
 
     @SuppressWarnings("unchecked")

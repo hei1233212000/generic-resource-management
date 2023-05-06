@@ -110,8 +110,6 @@ public class ResourceRequestSteps implements En {
             assertThat(actualErrorMessages).containsExactlyInAnyOrderElementsOf(expectedErrorMessages);
         });
 
-        ParameterType("resourceType", ".*",
-                (String resourceType) -> ResourceType.valueOf(resourceType));
         ParameterType("resourceRequestStatus", ".*",
                 (String resourceRequestStatus) ->
                         ResourceRequestDomainModel.ResourceRequestStatus.valueOf(resourceRequestStatus));
