@@ -12,8 +12,6 @@ import poc.genericresourcemanagement.interfaces.rest.mapper.ResourceDomainModel2
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 
@@ -25,9 +23,24 @@ public class ResourceHandler implements ApiHandler {
 
     public Mono<ServerResponse> getResources(final ServerRequest serverRequest) {
         final ResourceType resourceType = extractResourceTypeFromPath(serverRequest);
+        final ResourceDomainModel2DtoMapper<ResourceDomainModel, ? extends ResourceDto>
+                resourceDomainModel2DtoMapper = findResourceDomainModel2DtoMapper(resourceType);
         return resourceService.findResources(resourceType)
                 .collectList()
-                .map(domainModel2Dto(resourceType))
+                .map(l -> l.stream().map(resourceDomainModel2DtoMapper::domainModel2Dto))
+                .flatMap(resourceRequests -> ServerResponse.ok()
+                        .contentType(APPLICATION_JSON)
+                        .body(BodyInserters.fromValue(resourceRequests))
+                );
+    }
+
+    public Mono<ServerResponse> getResource(final ServerRequest serverRequest) {
+        final ResourceType resourceType = extractResourceTypeFromPath(serverRequest);
+        final String id = extractIdFromPath(serverRequest);
+        final ResourceDomainModel2DtoMapper<ResourceDomainModel, ? extends ResourceDto>
+                resourceDomainModel2DtoMapper = findResourceDomainModel2DtoMapper(resourceType);
+        return resourceService.findResource(resourceType, id)
+                .map(resourceDomainModel2DtoMapper::domainModel2Dto)
                 .flatMap(resourceRequests -> ServerResponse.ok()
                         .contentType(APPLICATION_JSON)
                         .body(BodyInserters.fromValue(resourceRequests))
@@ -35,19 +48,15 @@ public class ResourceHandler implements ApiHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private Function<List<? extends ResourceDomainModel>, Stream<ResourceDto>> domainModel2Dto(
+    private ResourceDomainModel2DtoMapper<ResourceDomainModel, ? extends ResourceDto> findResourceDomainModel2DtoMapper(
             final ResourceType resourceType
     ) {
-        return l -> l.stream().map(resourceDomainModel -> {
-            final ResourceDomainModel2DtoMapper<ResourceDomainModel, ? extends ResourceDto> resourceDomainModel2DtoMapper =
-                    (ResourceDomainModel2DtoMapper<ResourceDomainModel, ? extends ResourceDto>) resourceDomainModel2DtoMappers.stream()
-                            .filter(r -> r.isSupported(resourceType))
-                            .findFirst()
-                            .orElseThrow(
-                                    () -> new IllegalStateException(
-                                            "cannot find the resource mapper for " + resourceType)
-                            );
-            return resourceDomainModel2DtoMapper.domainModel2Dto(resourceDomainModel);
-        });
+        return (ResourceDomainModel2DtoMapper<ResourceDomainModel, ? extends ResourceDto>) resourceDomainModel2DtoMappers.stream()
+                .filter(r -> r.isSupported(resourceType))
+                .findFirst()
+                .orElseThrow(
+                        () -> new IllegalStateException(
+                                "cannot find the resource mapper for " + resourceType)
+                );
     }
 }

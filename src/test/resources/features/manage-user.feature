@@ -47,6 +47,13 @@ Feature: Manage USER
       | version     | 0                       |
       | createdTime | 2023-02-03T23:00:00.000 |
       | updatedTime | 2023-02-03T23:00:00.000 |
+    And query USER resource by id "1" should return the base info:
+      | id          | 1                       |
+      | name        | Peter                   |
+      | age         | 18                      |
+      | version     | 0                       |
+      | createdTime | 2023-02-03T23:00:00.000 |
+      | updatedTime | 2023-02-03T23:00:00.000 |
 
   Scenario: should have validation error when create USER resource without user age
     When I fire the create USER resource request as

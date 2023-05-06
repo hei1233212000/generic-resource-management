@@ -61,7 +61,7 @@ public class ResourceRequestRouter {
                     beanMethod = "getResourceRequest",
                     operation = @Operation(
                             operationId = "getResourceRequest",
-                            description = "get a single resource request",
+                            description = "retrieve a single resource request",
                             parameters = {
                                     @Parameter(
                                             name = "type", in = ParameterIn.PATH,

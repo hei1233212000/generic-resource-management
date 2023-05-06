@@ -39,7 +39,7 @@ public class ResourceRequestHandler implements ApiHandler {
     ) {
         return resourceRequestService.findResourceRequestDomainModelById(
                         extractResourceTypeFromPath(request),
-                        extractIdFromPath(request)
+                        extractIdAsLongFromPath(request)
                 )
                 .map(ResourceRequestHandler::convert2ResourceRequestDto)
                 .flatMap(resourceRequest -> ServerResponse.ok()
@@ -82,7 +82,7 @@ public class ResourceRequestHandler implements ApiHandler {
             final RequestOperation requestOperation
     ) {
         return resourceRequestService.approveOrCancelResourceRequest(
-                        extractResourceTypeFromPath(request), extractIdFromPath(request), requestOperation
+                        extractResourceTypeFromPath(request), extractIdAsLongFromPath(request), requestOperation
                 )
                 .map(ResourceRequestHandler::convert2ResourceRequestDto)
                 .flatMap(resourceRequest -> ServerResponse.status(HttpStatusCode.valueOf(200))

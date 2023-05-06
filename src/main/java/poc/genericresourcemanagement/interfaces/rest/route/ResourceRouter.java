@@ -48,6 +48,30 @@ public class ResourceRouter {
                                     @ApiResponse(
                                             responseCode = "200", description = "successful operation",
                                             content = @Content(array = @ArraySchema(schema = @Schema(oneOf = {UserDto.class, AccountDto.class})))
+                                    )
+                            }
+                    )
+            ),
+            @RouterOperation(
+                    path = "/resources/{type}/{resourceId}",
+                    produces = {MediaType.APPLICATION_JSON_VALUE},
+                    method = {RequestMethod.GET},
+                    beanClass = ResourceHandler.class,
+                    beanMethod = "getResource",
+                    operation = @Operation(
+                            operationId = "getResource",
+                            description = "retrieve a single resource",
+                            parameters = {
+                                    @Parameter(
+                                            name = "type", in = ParameterIn.PATH,
+                                            schema = @Schema(implementation = ResourceType.class)
+                                    ),
+                                    @Parameter(name = "resourceId", in = ParameterIn.PATH)
+                            },
+                            responses = {
+                                    @ApiResponse(
+                                            responseCode = "200", description = "successful operation",
+                                            content = @Content(schema = @Schema(oneOf = {UserDto.class, AccountDto.class}))
                                     ),
                                     @ApiResponse(responseCode = "404", description = "Resource not found")
                             }
@@ -66,6 +90,10 @@ public class ResourceRouter {
                                 "/{type}/",
                                 accept(APPLICATION_JSON),
                                 resourceHandler::getResources)
+                        .GET(
+                                "/{type}/{id}",
+                                accept(APPLICATION_JSON),
+                                resourceHandler::getResource)
                         .build()
                 );
     }

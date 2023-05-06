@@ -49,6 +49,13 @@ Feature: Manage ACCOUNT
       | version     | 0                                    |
       | createdTime | 2023-02-03T23:00:00.000              |
       | updatedTime | 2023-02-03T23:00:00.000              |
+    And query ACCOUNT resource by id "59e5ec44-799a-44ad-b202-27a01a1b660f" should return the base info:
+      | id          | 59e5ec44-799a-44ad-b202-27a01a1b660f |
+      | holder      | Peter Chan                           |
+      | amount      | 1000000.0                            |
+      | version     | 0                                    |
+      | createdTime | 2023-02-03T23:00:00.000              |
+      | updatedTime | 2023-02-03T23:00:00.000              |
 
   Scenario: should have validation error when create ACCOUNT resource without id
     When I fire the create ACCOUNT resource request as
