@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import poc.genericresourcemanagement.application.service.common.BeanValidationService;
 import poc.genericresourcemanagement.application.service.resource.creator.AccountResourceCreator;
+import poc.genericresourcemanagement.application.service.resource.finder.AccountResourceFinder;
 import poc.genericresourcemanagement.application.service.resource.validation.AccountResourceValidator;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.AccountRepository;
 
@@ -22,5 +23,10 @@ public class AccountResourceApplicationConfig {
             final BeanValidationService beanValidationService
     ) {
         return new AccountResourceValidator(objectMapper, beanValidationService);
+    }
+
+    @Bean
+    AccountResourceFinder accountResourceFinder(final AccountRepository accountRepository) {
+        return new AccountResourceFinder(accountRepository);
     }
 }

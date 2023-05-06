@@ -1,13 +1,10 @@
-package poc.genericresourcemanagement.domain.model;
-
-import jakarta.validation.constraints.NotNull;
+package poc.genericresourcemanagement.interfaces.model;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-public record AccountDomainModel(
-        @NotNull
+public record AccountDto(
         UUID id,
         String holder,
         BigDecimal amount,
@@ -16,5 +13,5 @@ public record AccountDomainModel(
         LocalDateTime createdTime,
         String updatedBy,
         LocalDateTime updatedTime
-) implements ResourceDomainModel {
+) implements ResourceDto {
 }

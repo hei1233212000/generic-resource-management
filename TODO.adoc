@@ -8,3 +8,4 @@
 - Update the API to support Batch update
 - Test report
 - Test Coverage
+- fix the 500 Server Error for HTTP GET "/favicon.ico"

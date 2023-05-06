@@ -20,4 +20,4 @@ public record UserDomainModel(
         LocalDateTime createdTime,
         String updatedBy,
         LocalDateTime updatedTime
-) {}
+) implements ResourceDomainModel {}

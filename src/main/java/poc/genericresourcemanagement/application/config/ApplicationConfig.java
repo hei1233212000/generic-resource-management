@@ -7,12 +7,11 @@ import org.springframework.context.annotation.Import;
 import poc.genericresourcemanagement.application.service.common.BeanValidationService;
 import poc.genericresourcemanagement.application.service.common.DefaultTimeGenerator;
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
-import poc.genericresourcemanagement.application.service.resource.ResourceCreationService;
-import poc.genericresourcemanagement.application.service.resource.ResourceRequestCreationValidationService;
-import poc.genericresourcemanagement.application.service.resource.ResourceRequestService;
-import poc.genericresourcemanagement.application.service.resource.ResourceRequestValidationService;
+import poc.genericresourcemanagement.application.service.resource.*;
 import poc.genericresourcemanagement.application.service.resource.creator.ResourceCreator;
+import poc.genericresourcemanagement.application.service.resource.finder.ResourceFinder;
 import poc.genericresourcemanagement.application.service.resource.validation.ResourceValidator;
+import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRequestRepository;
 
 import java.util.List;
@@ -68,5 +67,10 @@ public class ApplicationConfig {
     @Bean
     ResourceCreationService resourceCreationService(final List<ResourceCreator> resourceCreators) {
         return new ResourceCreationService(resourceCreators);
+    }
+
+    @Bean
+    ResourceService resourceService(final List<ResourceFinder<? extends ResourceDomainModel>> resourceFinders) {
+        return new ResourceService(resourceFinders);
     }
 }

@@ -9,11 +9,24 @@ import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import poc.genericresourcemanagement.application.service.resource.ResourceRequestService;
-import poc.genericresourcemanagement.interfaces.rest.ResourceRequestHandler;
-import poc.genericresourcemanagement.interfaces.rest.ResourceRequestRouter;
+import poc.genericresourcemanagement.application.service.resource.ResourceService;
+import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
+import poc.genericresourcemanagement.interfaces.model.ResourceDto;
 import poc.genericresourcemanagement.interfaces.rest.error.ErrorHandlingFunction;
+import poc.genericresourcemanagement.interfaces.rest.handler.ResourceHandler;
+import poc.genericresourcemanagement.interfaces.rest.handler.ResourceRequestHandler;
+import poc.genericresourcemanagement.interfaces.rest.mapper.ResourceDomainModel2DtoMapper;
+import poc.genericresourcemanagement.interfaces.rest.route.ResourceRequestRouter;
+import poc.genericresourcemanagement.interfaces.rest.route.ResourceRouter;
 
-@Import({ResourceRequestRouter.class})
+import java.util.List;
+
+@Import({
+        UserResourceInterfaceConfig.class,
+        AccountResourceInterfaceConfig.class,
+        ResourceRequestRouter.class,
+        ResourceRouter.class,
+})
 public class InterfaceConfig {
     @Bean
     // give it a higher priority than the DefaultErrorWebExceptionHandler
@@ -37,5 +50,13 @@ public class InterfaceConfig {
     @Bean
     ResourceRequestHandler resourceRequestHandler(final ResourceRequestService resourceRequestService) {
         return new ResourceRequestHandler(resourceRequestService);
+    }
+
+    @Bean
+    ResourceHandler resourceHandler(
+            final ResourceService resourceService,
+            final List<ResourceDomainModel2DtoMapper<? extends ResourceDomainModel, ? extends ResourceDto>> resourceDomainModel2DtoMappers
+    ) {
+        return new ResourceHandler(resourceService, resourceDomainModel2DtoMappers);
     }
 }

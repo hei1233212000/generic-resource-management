@@ -1,4 +1,4 @@
-package poc.genericresourcemanagement.interfaces.rest;
+package poc.genericresourcemanagement.interfaces.rest.route;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -21,6 +21,7 @@ import poc.genericresourcemanagement.domain.model.ResourceType;
 import poc.genericresourcemanagement.interfaces.model.CreateResourceRequestDto;
 import poc.genericresourcemanagement.interfaces.model.ErrorResponseDto;
 import poc.genericresourcemanagement.interfaces.model.ResourceRequestDto;
+import poc.genericresourcemanagement.interfaces.rest.handler.ResourceRequestHandler;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.web.reactive.function.server.RequestPredicates.*;
@@ -29,6 +30,29 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 @Log4j2
 public class ResourceRequestRouter {
     @RouterOperations({
+            @RouterOperation(
+                    path = "/resource-requests/{type}/",
+                    produces = {MediaType.APPLICATION_JSON_VALUE},
+                    method = {RequestMethod.GET},
+                    beanClass = ResourceRequestHandler.class,
+                    beanMethod = "getResourceRequests",
+                    operation = @Operation(
+                            operationId = "getResourceRequests",
+                            description = "retrieve resource requests by type",
+                            parameters = {
+                                    @Parameter(
+                                            name = "type", in = ParameterIn.PATH,
+                                            schema = @Schema(implementation = ResourceType.class)
+                                    )
+                            },
+                            responses = {
+                                    @ApiResponse(
+                                            responseCode = "200", description = "successful operation",
+                                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ResourceRequestDto.class)))
+                                    )
+                            }
+                    )
+            ),
             @RouterOperation(
                     path = "/resource-requests/{type}/{resourceRequestId}",
                     produces = {MediaType.APPLICATION_JSON_VALUE},
@@ -51,29 +75,6 @@ public class ResourceRequestRouter {
                                             content = @Content(schema = @Schema(implementation = ResourceRequestDto.class))
                                     ),
                                     @ApiResponse(responseCode = "404", description = "Resource request not found")
-                            }
-                    )
-            ),
-            @RouterOperation(
-                    path = "/resource-requests/{type}/",
-                    produces = {MediaType.APPLICATION_JSON_VALUE},
-                    method = {RequestMethod.GET},
-                    beanClass = ResourceRequestHandler.class,
-                    beanMethod = "getResourceRequests",
-                    operation = @Operation(
-                            operationId = "getResourceRequests",
-                            description = "retrieve all resource requests by type",
-                            parameters = {
-                                    @Parameter(
-                                            name = "type", in = ParameterIn.PATH,
-                                            schema = @Schema(implementation = ResourceType.class)
-                                    )
-                            },
-                            responses = {
-                                    @ApiResponse(
-                                            responseCode = "200", description = "successful operation",
-                                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ResourceRequestDto.class)))
-                                    )
                             }
                     )
             ),
@@ -176,10 +177,6 @@ public class ResourceRequestRouter {
         return RouterFunctions
                 .nest(path("/resource-requests"), route()
                         .GET(
-                                "/{type}/{id}",
-                                accept(APPLICATION_JSON),
-                                resourceRequestHandler::getResourceRequest)
-                        .GET(
                                 "/{type}/",
                                 accept(APPLICATION_JSON),
                                 resourceRequestHandler::getResourceRequests)
@@ -187,6 +184,11 @@ public class ResourceRequestRouter {
                                 "/{type}",
                                 accept(APPLICATION_JSON),
                                 resourceRequestHandler::getResourceRequests)
+                        .GET(
+                                "/{type}/{id}",
+                                accept(APPLICATION_JSON),
+                                resourceRequestHandler::getResourceRequest)
+
                         .POST(
                                 "/{type}/",
                                 contentType(APPLICATION_JSON).and(accept(APPLICATION_JSON)),
