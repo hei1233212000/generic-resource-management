@@ -44,7 +44,7 @@ public class InterfaceConfig {
     @Bean
     Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {
         return jacksonObjectMapperBuilder -> jacksonObjectMapperBuilder
-                .serializers(new LocalDateTimeJsonSerializer());
+                .serializers(new LocalDateTimeJsonSerializer(), new BigDecimalJsonSerializer());
     }
 
     @Bean
