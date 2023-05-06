@@ -18,4 +18,4 @@ jobs:
       - name: Run build with Gradle Wrapper
         run: ./gradlew clean build
       - name: Generate OpenAPI doc
-        run: ./gradle clean generateOpenApiDocs
+        run: ./gradlew clean generateOpenApiDocs
