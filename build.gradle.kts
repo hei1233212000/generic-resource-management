@@ -2,6 +2,7 @@ plugins {
     java
     id("org.springframework.boot") version "3.0.5"
     id("io.spring.dependency-management") version "1.1.0"
+    id("org.springdoc.openapi-gradle-plugin") version "1.6.0"
 }
 
 group = "poc"
@@ -58,4 +59,8 @@ tasks.withType<Test> {
       between different examples and scenarios.
      */
     systemProperty("cucumber.junit-platform.naming-strategy", "long")
+}
+
+openApi {
+    apiDocsUrl.set("http://localhost:8081/v3/api-docs")
 }
