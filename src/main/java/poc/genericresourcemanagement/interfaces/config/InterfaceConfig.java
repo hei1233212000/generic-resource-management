@@ -8,6 +8,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.codec.ServerCodecConfigurer;
+import poc.genericresourcemanagement.application.service.resource.ResourceRequestService;
+import poc.genericresourcemanagement.interfaces.rest.ResourceRequestHandler;
 import poc.genericresourcemanagement.interfaces.rest.ResourceRequestRouter;
 import poc.genericresourcemanagement.interfaces.rest.error.ErrorHandlingFunction;
 
@@ -30,5 +32,10 @@ public class InterfaceConfig {
     Jackson2ObjectMapperBuilderCustomizer jackson2ObjectMapperBuilderCustomizer() {
         return jacksonObjectMapperBuilder -> jacksonObjectMapperBuilder
                 .serializers(new LocalDateTimeJsonSerializer());
+    }
+
+    @Bean
+    ResourceRequestHandler resourceRequestHandler(final ResourceRequestService resourceRequestService) {
+        return new ResourceRequestHandler(resourceRequestService);
     }
 }
