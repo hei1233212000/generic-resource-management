@@ -3,6 +3,7 @@ plugins {
     id("org.springframework.boot") version "3.0.5"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.springdoc.openapi-gradle-plugin") version "1.6.0"
+    jacoco
 }
 
 group = "poc"
@@ -51,7 +52,7 @@ dependencies {
     testImplementation("io.rest-assured:rest-assured:5.3.0")
 }
 
-tasks.withType<Test> {
+tasks.test {
     useJUnitPlatform()
 
     /*
@@ -59,6 +60,17 @@ tasks.withType<Test> {
       between different examples and scenarios.
      */
     systemProperty("cucumber.junit-platform.naming-strategy", "long")
+
+    // report is always generated after tests run
+    finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+    // tests are required to run before generating the report
+    dependsOn(tasks.test)
+    reports {
+        xml.required.set(true)
+    }
 }
 
 openApi {
