@@ -75,4 +75,4 @@ Feature: Manage ACCOUNT
   Scenario: should have validation error when we are not using uuid to query account
     When I query ACCOUNT resource by id "not-uuid"
     Then the query resource is failed with http status code 400 with error messages:
-      | 'not-uuid' is not a valid UUID |
+      | 'not-uuid1' is not a valid UUID |
