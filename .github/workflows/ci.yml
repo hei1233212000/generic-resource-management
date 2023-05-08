@@ -33,14 +33,19 @@ jobs:
 #        with:
 #          name: test-reports
 #          path: build/test-results/
-      - name: Publish Coverage Report
-        id: jacoco
-        uses: madrapps/jacoco-report@v1.3
+#      - name: Build Coverage Reports
+#        id: jacoco
+#        uses: madrapps/jacoco-report@v1.3
+#        with:
+#          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          min-coverage-overall: 40
+#          min-coverage-changed-files: 60
+      - name: Generate JaCoCo Badge
+        uses: cicirello/jacoco-badge-generator@v2.8.1
         with:
-          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          min-coverage-overall: 40
-          min-coverage-changed-files: 60
+          generate-branches-badge: true
+          jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
 #  generate-open-api-doc:
 #    needs: [ clean-build ]
 #    runs-on: ubuntu-latest
