@@ -32,19 +32,22 @@ jobs:
   #          min-coverage-overall: 40
   #          min-coverage-changed-files: 60
   generate-test-reports:
-    - needs: [ clean-build ]
-    - uses: actions/download-artifact@v3
-      with:
-        name: test-reports
-        path: build/test-results/
-    - name: Build Test Report
-      uses: dorny/test-reporter@v1.6.0
-      if: success() || failure()
-      with:
-        name: Test Report
-        path: '**/build/test-results/**/TEST-*.xml'
-        reporter: java-junit
+    needs: [ clean-build ]
+    steps:
+      - name: Download Test Reports
+      - uses: actions/download-artifact@v3
+        with:
+          name: test-reports
+          path: build/test-results/
+      - name: Build Test Reports
+        uses: dorny/test-reporter@v1.6.0
+        if: success() || failure()
+        with:
+          name: Test Reports
+          path: '**/build/test-results/**/TEST-*.xml'
+          reporter: java-junit
   generate-open-api-doc:
-    - needs: [ clean-build ]
-    - name: Generate OpenAPI doc
-      run: ./gradlew clean generateOpenApiDocs
+    needs: [ clean-build ]
+    steps:
+      - name: Generate OpenAPI doc
+        run: ./gradlew clean generateOpenApiDocs
