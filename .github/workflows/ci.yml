@@ -5,6 +5,8 @@ on: [ push ]
 jobs:
   clean-build:
     runs-on: ubuntu-latest
+    permissions:
+      checks: write
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v3
@@ -17,29 +19,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
       - name: Run build with Gradle Wrapper
         run: ./gradlew clean build
-      - name: Upload Test Reports
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-reports
-          path: build/test-results/
-  #      - name: Publish Coverage Report
-  #        uses: madrapps/jacoco-report@v1.3
-  #        with:
-  #          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
-  #          token: ${{ secrets.GITHUB_TOKEN }}
-  #          min-coverage-overall: 40
-  #          min-coverage-changed-files: 60
-  generate-test-reports:
-    needs: [ clean-build ]
-    runs-on: ubuntu-latest
-    permissions:
-      checks: write
-    steps:
-      - name: Download Test Reports
-        uses: actions/download-artifact@v3
-        with:
-          name: test-reports
-          path: build/test-results/
+      # currently we cannot move it into other jobs because of "not a git repository" issue
       - name: Build Test Reports
         uses: dorny/test-reporter@v1.6.0
         if: success() || failure()
@@ -47,7 +27,19 @@ jobs:
           name: Test Reports
           path: '**/TEST-*.xml'
           reporter: java-junit
-          max-annotations: '0'
+#          max-annotations: '0' # enable it after we can use it to disable listing
+#      - name: Upload Test Reports
+#        uses: actions/upload-artifact@v3
+#        with:
+#          name: test-reports
+#          path: build/test-results/
+  #      - name: Publish Coverage Report
+  #        uses: madrapps/jacoco-report@v1.3
+  #        with:
+  #          paths: ${{ github.workspace }}/build/reports/jacoco/test/jacocoTestReport.xml
+  #          token: ${{ secrets.GITHUB_TOKEN }}
+  #          min-coverage-overall: 40
+  #          min-coverage-changed-files: 60
 #  generate-open-api-doc:
 #    needs: [ clean-build ]
 #    runs-on: ubuntu-latest
