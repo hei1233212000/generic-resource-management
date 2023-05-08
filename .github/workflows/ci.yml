@@ -46,9 +46,13 @@ jobs:
         with:
           generate-branches-badge: true
           jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
-#  generate-open-api-doc:
-#    needs: [ clean-build ]
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Generate OpenAPI doc
-#        run: ./gradlew clean generateOpenApiDocs
+  generate-open-api-doc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate OpenAPI Document
+        run: ./gradlew clean generateOpenApiDocs
+      - name: Upload OpenAPI Document
+        uses: actions/upload-artifact@v3
+        with:
+          name: open-api-doc
+          path: build/openapi.json
