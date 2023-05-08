@@ -45,9 +45,9 @@ jobs:
         if: success() || failure()
         with:
           name: Test Reports
-          path: '**/build/test-results/**/TEST-*.xml'
+          path: '**/TEST-*.xml'
           reporter: java-junit
-          max-annotations: 0
+          max-annotations: '0'
 #  generate-open-api-doc:
 #    needs: [ clean-build ]
 #    runs-on: ubuntu-latest
