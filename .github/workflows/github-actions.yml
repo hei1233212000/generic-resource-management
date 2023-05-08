@@ -19,7 +19,7 @@ jobs:
         uses: gradle/gradle-build-action@v2
       - name: Run build with Gradle Wrapper
         run: ./gradlew clean build
-      - name: Test Reporter
+      - name: Build Test Report
         uses: dorny/test-reporter@v1.6.0
         if: success() || failure()
         with:
