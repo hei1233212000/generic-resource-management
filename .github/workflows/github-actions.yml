@@ -30,10 +30,10 @@ jobs:
   #          min-coverage-overall: 40
   #          min-coverage-changed-files: 60
   generate-test-reports:
+    needs: [ clean-build ]
     runs-on: ubuntu-latest
     permissions:
       checks: write
-    needs: [ clean-build ]
     steps:
       - name: Download Test Reports
       - uses: actions/download-artifact@v3
@@ -49,6 +49,7 @@ jobs:
           reporter: java-junit
   generate-open-api-doc:
     needs: [ clean-build ]
+    runs-on: ubuntu-latest
     steps:
       - name: Generate OpenAPI doc
         run: ./gradlew clean generateOpenApiDocs
