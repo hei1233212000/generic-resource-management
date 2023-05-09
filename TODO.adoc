@@ -6,4 +6,3 @@
 - Resource API (including download)
 - Import CSV for batch creation
 - Update the API to support Batch update
-- fix the 500 Server Error for HTTP GET "/favicon.ico"
