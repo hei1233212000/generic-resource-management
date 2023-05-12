@@ -6,7 +6,7 @@ import io.restassured.filter.log.RequestLoggingFilter;
 import io.restassured.filter.log.ResponseLoggingFilter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.r2dbc.core.R2dbcEntityOperations;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import poc.genericresourcemanagement.domain.model.ResourceType;
 import poc.genericresourcemanagement.test.cucumber.service.ManualTimeGenerator;
@@ -21,7 +21,7 @@ public class GenericResourceManagementCucumberTestHook implements LambdaGlue {
     public GenericResourceManagementCucumberTestHook(
             @LocalServerPort final int port,
             final ManualTimeGenerator manualTimeGenerator,
-            final R2dbcEntityTemplate r2dbcEntityTemplate,
+            final R2dbcEntityOperations r2dbcEntityOperations,
             final List<R2dbcRepository<?, ?>> r2dbcRepositories
     ) {
         Before(0, scenario -> {
@@ -34,7 +34,7 @@ public class GenericResourceManagementCucumberTestHook implements LambdaGlue {
             log.info("going to set the current time to: {}", time);
 
             cleanUpDatabase(r2dbcRepositories);
-            resetDbSequencers(r2dbcEntityTemplate);
+            resetDbSequencers(r2dbcEntityOperations);
         });
 
         After(0, scenario -> RestAssured.reset());
@@ -47,18 +47,18 @@ public class GenericResourceManagementCucumberTestHook implements LambdaGlue {
         });
     }
 
-    private static void resetDbSequencers(final R2dbcEntityTemplate r2dbcEntityTemplate) {
+    private static void resetDbSequencers(final R2dbcEntityOperations r2dbcEntityOperations) {
         for(final ResourceType resourceType : ResourceType.values()) {
-            resetDbSequence(r2dbcEntityTemplate, resourceType + "_RESOURCE_REQUEST_ID_SEQ");
+            resetDbSequence(r2dbcEntityOperations, resourceType + "_RESOURCE_REQUEST_ID_SEQ");
         }
-        resetDbSequence(r2dbcEntityTemplate, "USER_ID_SEQ");
+        resetDbSequence(r2dbcEntityOperations, "USER_ID_SEQ");
     }
 
     private static void resetDbSequence(
-            final R2dbcEntityTemplate r2dbcEntityTemplate,
+            final R2dbcEntityOperations r2dbcEntityOperations,
             final String sequenceName
     ) {
-        r2dbcEntityTemplate.getDatabaseClient()
+        r2dbcEntityOperations.getDatabaseClient()
                 .sql("ALTER SEQUENCE " + sequenceName + " RESTART WITH 1")
                 .then()
                 .block();
