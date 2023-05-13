@@ -1,4 +1,4 @@
-Feature: Manage resource
+Feature: Manage resource requests
 
   Background:
     Given the current time is "2023-02-03T12:34:56.123"
@@ -10,7 +10,7 @@ Feature: Manage resource
     Then the resource response is an empty array
 
   Scenario: should able to cancel resource request
-    And I create a PENDING_APPROVAL USER resource request "1" in DB with content
+    Given I create a PENDING_APPROVAL USER resource request "1" in DB with content
     """
     {
       "name": "Peter",
@@ -42,7 +42,7 @@ Feature: Manage resource
       | cancel    |
 
   Scenario Outline: should have validation error when approving or cancelling resource request is not in pending approval status
-    And I create a <originalRequestStatus> USER resource request "1" in DB with content
+    Given I create a <originalRequestStatus> USER resource request "1" in DB with content
     """
     {
       "name": "Peter",
@@ -76,7 +76,7 @@ Feature: Manage resource
       | 'reason' must not be blank |
 
   Scenario: should perform validation on approval
-    And I create a PENDING_APPROVAL USER resource request "1" in DB with content
+    Given I create a PENDING_APPROVAL USER resource request "1" in DB with content
     """
     {
       "name": "Peter"
@@ -88,7 +88,7 @@ Feature: Manage resource
       | 'age' must not be null |
 
   Scenario: should not perform validation on cancel
-    And I create a PENDING_APPROVAL USER resource request "1" in DB with content
+    Given I create a PENDING_APPROVAL USER resource request "1" in DB with content
     """
     {
       "name": "Peter"

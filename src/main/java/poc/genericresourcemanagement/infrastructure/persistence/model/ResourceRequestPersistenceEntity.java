@@ -19,21 +19,27 @@ import java.io.Serializable;
 public class ResourceRequestPersistenceEntity extends AbstractPersistenceEntity {
 
     @Column
+    @SearchableField
     private ResourceType type;
 
     @Column
+    @SearchableField
+    @SortableField
     private Long id;
 
     @Column
     private JsonNode content;
 
     @Column
+    @SearchableField
     private String reason;
 
     @Column
+    @SearchableField
     private ResourceRequestDomainModel.ResourceRequestOperation operation;
 
     @Column
+    @SearchableField
     private ResourceRequestDomainModel.ResourceRequestStatus status;
 
     /**

@@ -9,8 +9,10 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.r2dbc.convert.R2dbcCustomConversions;
 import org.springframework.data.r2dbc.dialect.DialectResolver;
 import org.springframework.data.r2dbc.dialect.R2dbcDialect;
+import org.springframework.data.relational.RelationalManagedTypes;
 import poc.genericresourcemanagement.infrastructure.persistence.model.converter.JsonNode2StringConverter;
 import poc.genericresourcemanagement.infrastructure.persistence.model.converter.String2JsonNodeConverter;
+import poc.genericresourcemanagement.infrastructure.persistence.service.PersistenceEntityService;
 
 import java.util.List;
 
@@ -29,5 +31,10 @@ public class PersistenceConfig {
         );
         final R2dbcDialect r2dbcDialect = DialectResolver.getDialect(connectionFactory);
         return R2dbcCustomConversions.of(r2dbcDialect, converters);
+    }
+
+    @Bean
+    PersistenceEntityService persistenceEntityService(final RelationalManagedTypes relationalManagedTypes) {
+        return new PersistenceEntityService(relationalManagedTypes.toList());
     }
 }

@@ -18,12 +18,12 @@ public record ResourceRequestDomainModel(
         LocalDateTime createdTime,
         String updatedBy,
         LocalDateTime updatedTime
-) {
+) implements DomainModel {
     public enum ResourceRequestStatus {
         PENDING_APPROVAL, APPROVED, CANCELLED
     }
 
     public enum ResourceRequestOperation {
-        CREATE
+        CREATE, UPDATE
     }
 }

@@ -11,19 +11,25 @@ import java.time.LocalDateTime;
 @Data
 @NoArgsConstructor
 @SuperBuilder
-public class AbstractPersistenceEntity {
+public class AbstractPersistenceEntity implements PersistenceEntity {
     @Version
     private Long version;
 
     @Column
+    @SearchableField
     private String createdBy;
 
     @Column("CREATED_TIMESTAMP")
+    @SearchableField
+    @SortableField
     private LocalDateTime createdTime;
 
     @Column
+    @SearchableField
     private String updatedBy;
 
     @Column("UPDATED_TIMESTAMP")
+    @SearchableField
+    @SortableField
     private LocalDateTime updatedTime;
 }

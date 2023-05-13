@@ -26,6 +26,7 @@ import java.util.List;
         AccountResourceInterfaceConfig.class,
         ResourceRequestRouter.class,
         ResourceRouter.class,
+        OpenApiConfig.class,
 })
 public class InterfaceConfig {
     @Bean

@@ -13,7 +13,7 @@ public record ResourceRequestDto(
         ResourceType type,
         Long id,
 
-        @Schema(description = "This is the actual resource content that it could also be an array")
+        @Schema(ref = "ResourceContent")
         JsonNode content,
         String reason,
         ResourceRequestDomainModel.ResourceRequestOperation operation,

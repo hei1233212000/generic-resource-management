@@ -3,8 +3,8 @@ package poc.genericresourcemanagement.interfaces.rest.route;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -20,6 +20,7 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import poc.genericresourcemanagement.domain.model.ResourceType;
 import poc.genericresourcemanagement.interfaces.model.CreateResourceRequestDto;
 import poc.genericresourcemanagement.interfaces.model.ErrorResponseDto;
+import poc.genericresourcemanagement.interfaces.model.PageableDto;
 import poc.genericresourcemanagement.interfaces.model.ResourceRequestDto;
 import poc.genericresourcemanagement.interfaces.rest.handler.ResourceRequestHandler;
 
@@ -43,12 +44,28 @@ public class ResourceRequestRouter {
                                     @Parameter(
                                             name = "type", in = ParameterIn.PATH,
                                             schema = @Schema(implementation = ResourceType.class)
+                                    ),
+                                    @Parameter(
+                                            name = "size", in = ParameterIn.QUERY,
+                                            description = "default size is 50",
+                                            schema = @Schema(implementation = Integer.class)
+                                    ),
+                                    @Parameter(
+                                            name = "page", in = ParameterIn.QUERY,
+                                            description = "default page is 0",
+                                            schema = @Schema(implementation = Integer.class)
+                                    ),
+                                    @Parameter(
+                                            name = "sort", in = ParameterIn.QUERY,
+                                            description = "sort the results by different fields with direction (default ascending); e.g. id,createdTime-,updatedTime+",
+                                            schema = @Schema(implementation = String.class)
                                     )
+                                    // now cannot use OpenAPI to provide the doc our the filter. Details: https://github.com/OAI/OpenAPI-Specification/issues/1502
                             },
                             responses = {
                                     @ApiResponse(
                                             responseCode = "200", description = "successful operation",
-                                            content = @Content(array = @ArraySchema(schema = @Schema(implementation = ResourceRequestDto.class)))
+                                            content = @Content(schema = @Schema(implementation = ResourceRequestPageableDto.class))
                                     )
                             }
                     )
@@ -95,7 +112,36 @@ public class ResourceRequestRouter {
                                     )
                             },
                             requestBody = @RequestBody(
-                                    content = @Content(schema = @Schema(implementation = CreateResourceRequestDto.class))
+                                    content = @Content(
+                                            schema = @Schema(implementation = CreateResourceRequestDto.class),
+                                            examples = {
+                                                        @ExampleObject(
+                                                            name = "Create User",
+                                                            value = """
+                                                                    {
+                                                                      "content": {
+                                                                        "name": "David Wong",
+                                                                        "age": 40
+                                                                      },
+                                                                      "reason": "create David"
+                                                                    }
+                                                                    """
+                                                    ),
+                                                    @ExampleObject(
+                                                            name = "Create Account",
+                                                            value = """
+                                                                    {
+                                                                      "content": {
+                                                                        "id": "59e5ec44-799a-44ad-b202-27a01a1b660f",
+                                                                        "holder": "Peter Chan",
+                                                                        "amount": "1000000"
+                                                                      },
+                                                                      "reason": "create new account"
+                                                                    }
+                                                                    """
+                                                    )
+                                            }
+                                    )
                             ),
                             responses = {
                                     @ApiResponse(
@@ -212,4 +258,9 @@ public class ResourceRequestRouter {
                         .build()
                 );
     }
+
+    /**
+     * Just for OpenAPI documentation
+     */
+    public static class ResourceRequestPageableDto extends PageableDto<ResourceRequestDto> {}
 }

@@ -3,11 +3,13 @@ package poc.genericresourcemanagement.application.service.resource.finder;
 import poc.genericresourcemanagement.application.service.common.ResourceSpecificComponent;
 import poc.genericresourcemanagement.domain.model.ResourceDomainModel;
 import poc.genericresourcemanagement.domain.model.ResourceType;
-import reactor.core.publisher.Flux;
+import poc.genericresourcemanagement.infrastructure.persistence.model.PersistenceEntity;
 import reactor.core.publisher.Mono;
 
-public interface ResourceFinder<DOMAIN extends ResourceDomainModel> extends ResourceSpecificComponent {
-    Flux<DOMAIN> findResources();
+public interface ResourceFinder extends ResourceSpecificComponent {
+    Mono<ResourceDomainModel> findResource(final ResourceType resourceType, final String id);
 
-    Mono<DOMAIN> findResource(final ResourceType resourceType, final String id);
+    Class<? extends PersistenceEntity> persistenceEntityClass();
+
+    ResourceDomainModel convertPersistenceEntity2DomainModel(PersistenceEntity persistenceEntity);
 }

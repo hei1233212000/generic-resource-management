@@ -26,6 +26,6 @@ public class GenericResourceManagementCucumberTestConfig {
         TimeGenerator ManualTimeGenerator() {
             log.info("Using DefaultTimeGenerator");
             return new ManualTimeGenerator();
-        };
+        }
     }
 }

@@ -1,4 +1,4 @@
 package poc.genericresourcemanagement.domain.model;
 
-public interface ResourceDomainModel {
+public interface ResourceDomainModel extends DomainModel {
 }

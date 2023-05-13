@@ -3,7 +3,6 @@ package poc.genericresourcemanagement.interfaces.rest.route;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -18,6 +17,7 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import poc.genericresourcemanagement.domain.model.ResourceType;
 import poc.genericresourcemanagement.interfaces.model.AccountDto;
+import poc.genericresourcemanagement.interfaces.model.PageableDto;
 import poc.genericresourcemanagement.interfaces.model.UserDto;
 import poc.genericresourcemanagement.interfaces.rest.handler.ResourceHandler;
 
@@ -42,12 +42,27 @@ public class ResourceRouter {
                                     @Parameter(
                                             name = "type", in = ParameterIn.PATH,
                                             schema = @Schema(implementation = ResourceType.class)
+                                    ),
+                                    @Parameter(
+                                            name = "size", in = ParameterIn.QUERY,
+                                            description = "default size is 50",
+                                            schema = @Schema(implementation = Integer.class)
+                                    ),
+                                    @Parameter(
+                                            name = "page", in = ParameterIn.QUERY,
+                                            description = "default page is 0",
+                                            schema = @Schema(implementation = Integer.class)
+                                    ),
+                                    @Parameter(
+                                            name = "sort", in = ParameterIn.QUERY,
+                                            description = "sort the results by different fields with direction (default ascending); e.g. id,createdTime-,updatedTime+",
+                                            schema = @Schema(implementation = String.class)
                                     )
                             },
                             responses = {
                                     @ApiResponse(
                                             responseCode = "200", description = "successful operation",
-                                            content = @Content(array = @ArraySchema(schema = @Schema(oneOf = {UserDto.class, AccountDto.class})))
+                                            content = @Content(schema = @Schema(oneOf = {UserPageableDto.class, AccountPageableDto.class}))
                                     )
                             }
                     )
@@ -97,4 +112,14 @@ public class ResourceRouter {
                         .build()
                 );
     }
+
+    /**
+     * Just for OpenAPI documentation
+     */
+    public static class UserPageableDto extends PageableDto<UserDto> {}
+
+    /**
+     * Just for OpenAPI documentation
+     */
+    public static class AccountPageableDto extends PageableDto<AccountDto> {}
 }

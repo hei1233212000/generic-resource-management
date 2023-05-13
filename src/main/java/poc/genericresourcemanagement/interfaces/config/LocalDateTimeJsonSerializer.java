@@ -18,7 +18,6 @@ public class LocalDateTimeJsonSerializer extends JsonSerializer<LocalDateTime> {
             .appendLiteral('T')
             .append(DateTimeFormatter.ofPattern("HH:mm:ss.SSS"))
             .toFormatter();
-    ;
 
     @Override
     public void serialize(

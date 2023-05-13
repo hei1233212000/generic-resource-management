@@ -5,22 +5,31 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java8.En;
+import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
 import poc.genericresourcemanagement.domain.model.ResourceType;
 import poc.genericresourcemanagement.infrastructure.persistence.model.ResourceRequestPersistenceEntity;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRequestRepository;
+import poc.genericresourcemanagement.interfaces.model.PageableDto;
+import poc.genericresourcemanagement.interfaces.model.ResourceRequestDto;
 import poc.genericresourcemanagement.test.cucumber.common.Verifications;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.assertj.core.api.Assertions.assertThat;
+import static poc.genericresourcemanagement.interfaces.config.LocalDateTimeJsonSerializer.DATE_TIME_FORMATTER;
+import static poc.genericresourcemanagement.test.cucumber.common.Verifications.verifyPageableInfo;
 
 @Log4j2
 @SuppressWarnings("unused")
@@ -58,6 +67,16 @@ public class ResourceRequestSteps implements En {
                             .as("resource should be created")
                             .isNotNull();
                 });
+        Given("the below resource requests are already exist:",
+                (final DataTable dataTable) ->
+                {
+                    final List<ResourceRequestPersistenceEntity> resourceRequestPersistenceEntities =
+                            dataTable.asMaps().stream()
+                                    .map(data -> toResourceRequestPersistenceEntity(objectMapper, data))
+                                    .collect(Collectors.toList());
+                    resourceRequestRepository.saveAll(resourceRequestPersistenceEntities).blockLast();
+                }
+        );
 
         When("I query {resourceType} resource by request id {string}",
                 (ResourceType resourceType, String requestId) -> response = when()
@@ -76,14 +95,20 @@ public class ResourceRequestSteps implements En {
         When("I {} the {resourceType} resource request {string}",
                 (String requestType, ResourceType resourceType, String requestId) -> response = given()
                         .post("/resource-requests/{resourceType}/{requestId}/{requestType}", resourceType, requestId,
-                                requestType));
+                                requestType)
+        );
+        When("I query {resourceType} resource requests by using query parameters {string}",
+                (ResourceType resourceType, String queryParameters) -> {
+                    final String path = "/resource-requests/{resourceType}" +
+                            (queryParameters.isBlank() ? "" : "?" + queryParameters);
+                    response = given().get(path, resourceType);
+                }
+        );
 
         Then("the resource response is an empty array", () -> {
-            final JsonNode jsonNode = objectMapper.readTree(response.body().asString());
-            assertThat(jsonNode.isArray())
-                    .as("should be an array")
-                    .isTrue();
-            assertThat(jsonNode).isEmpty();
+            final PageableDto<ResourceRequestDto> pageableDto = response.body().as(new TypeRef<>() {});
+            assertThat(pageableDto).isNotNull();
+            assertThat(pageableDto.getData()).isEmpty();
         });
         Then("the resource request is (successfully processed)(failed) with http status code {int}",
                 (Integer expectedHttpStatusCode) -> response.then().statusCode(expectedHttpStatusCode));
@@ -109,9 +134,52 @@ public class ResourceRequestSteps implements En {
 
             assertThat(actualErrorMessages).containsExactlyInAnyOrderElementsOf(expectedErrorMessages);
         });
+        Then("I would get the {resourceType} resource requests with id {intList}",
+                (ResourceType resourceType, List<String> expectedIds) -> {
+                    final PageableDto<ResourceRequestDto> pageableDto = response.body().as(new TypeRef<>() {});
+                    final List<String> actualIds = new ArrayList<>();
+                    pageableDto.getData().forEach(resourceRequestDto -> {
+                        final ResourceType actualType = resourceRequestDto.type();
+                        assertThat(actualType)
+                                .as("the resourceRequestDto is not in %s type - %s", resourceType, resourceRequestDto)
+                                .isEqualTo(resourceType);
+                        actualIds.add(resourceRequestDto.id().toString());
+                    });
+                    assertThat(actualIds).containsExactlyElementsOf(expectedIds);
+                }
+        );
+        Then("I would get the resource requests with below pagination info:", (DataTable dataTable) -> verifyPageableInfo(response, dataTable));
 
         ParameterType("resourceRequestStatus", ".*",
-                (String resourceRequestStatus) ->
-                        ResourceRequestDomainModel.ResourceRequestStatus.valueOf(resourceRequestStatus));
+                (String resourceRequestStatus) -> ResourceRequestDomainModel.ResourceRequestStatus.valueOf(
+                        resourceRequestStatus)
+        );
+    }
+
+    @SneakyThrows
+    private ResourceRequestPersistenceEntity toResourceRequestPersistenceEntity(
+            final ObjectMapper objectMapper,
+            final Map<String, String> data
+    ) {
+        return ResourceRequestPersistenceEntity.builder()
+                .type(data.containsKey("type") ? ResourceType.valueOf(data.get("type")) : null)
+                .id(data.containsKey("id") ? Long.parseLong(data.get("id")) : null)
+                .content(data.containsKey("content") ? objectMapper.readTree(data.get("content")) : null)
+                .reason(data.getOrDefault("reason", null))
+                .operation(data.containsKey("operation") ?
+                        ResourceRequestDomainModel.ResourceRequestOperation.valueOf(data.get("operation")) :
+                        null)
+                .status(data.containsKey("status") ?
+                        ResourceRequestDomainModel.ResourceRequestStatus.valueOf(data.get("status")) :
+                        null)
+                .createdBy(data.getOrDefault("createdBy", null))
+                .createdTime(data.containsKey("createdTime") ?
+                        LocalDateTime.parse(data.get("createdTime"), DATE_TIME_FORMATTER) :
+                        null)
+                .updatedBy(data.getOrDefault("updatedBy", null))
+                .updatedTime(data.containsKey("updatedTime") ?
+                        LocalDateTime.parse(data.get("updatedTime"), DATE_TIME_FORMATTER) :
+                        null)
+                .build();
     }
 }

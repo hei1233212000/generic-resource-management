@@ -6,16 +6,23 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import poc.genericresourcemanagement.application.model.CreateResourceRequest;
+import poc.genericresourcemanagement.application.model.Query;
 import poc.genericresourcemanagement.application.model.RequestOperation;
+import poc.genericresourcemanagement.application.model.SearchCriteria;
 import poc.genericresourcemanagement.application.service.resource.ResourceRequestService;
 import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
+import poc.genericresourcemanagement.domain.model.ResourceType;
 import poc.genericresourcemanagement.interfaces.model.CreateResourceRequestDto;
+import poc.genericresourcemanagement.interfaces.model.PageableDto;
 import poc.genericresourcemanagement.interfaces.model.ResourceRequestDto;
+import poc.genericresourcemanagement.interfaces.rest.util.Queries;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static poc.genericresourcemanagement.application.model.SearchCriteria.SearchCriteriaOperator.eq;
 
 @RequiredArgsConstructor
 public class ResourceRequestHandler implements ApiHandler {
@@ -24,13 +31,26 @@ public class ResourceRequestHandler implements ApiHandler {
     public Mono<ServerResponse> getResourceRequests(
             final ServerRequest request
     ) {
-        return resourceRequestService.findResourceRequestDomainModelsByType(extractResourceTypeFromPath(request))
-                .collectList()
-                .map(l -> l.stream().map(ResourceRequestHandler::convert2ResourceRequestDto)
-                        .collect(Collectors.toList()))
-                .flatMap(resourceRequests -> ServerResponse.ok()
+        final ResourceType type = extractResourceTypeFromPath(request);
+        final SearchCriteria searchType = new SearchCriteria("type", eq, type);
+        final Query query = Queries.generateQuery(request, searchType);
+        return resourceRequestService.findResourceRequestDomainModelsByType(query)
+                .map(p -> {
+                    final List<ResourceRequestDto> resourceRequestDtos = p.data().stream()
+                                    .map(ResourceRequestHandler::convert2ResourceRequestDto)
+                                    .collect(Collectors.toList());
+                    return PageableDto.<ResourceRequestDto>builder()
+                            .pageNumber(p.pageNumber())
+                            .pageSize(p.pageSize())
+                            .numberOfElements(p.numberOfElements())
+                            .totalPages(p.totalPages())
+                            .totalElements(p.totalElements())
+                            .data(resourceRequestDtos)
+                            .build();
+                })
+                .flatMap(pageableDto -> ServerResponse.ok()
                         .contentType(APPLICATION_JSON)
-                        .body(BodyInserters.fromValue(resourceRequests))
+                        .body(BodyInserters.fromValue(pageableDto))
                 );
     }
 

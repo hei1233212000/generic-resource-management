@@ -14,11 +14,17 @@ import org.springframework.data.relational.core.mapping.Table;
 @ToString(callSuper = true)
 public class UserPersistenceEntity extends AbstractPersistenceEntity {
     @Id
+    @SearchableField
+    @SortableField
     private Long id;
 
     @Column
+    @SearchableField
+    @SortableField
     private String name;
 
     @Column
+    @SearchableField
+    @SortableField
     private Integer age;
 }

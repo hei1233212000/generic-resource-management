@@ -6,13 +6,14 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.transaction.annotation.Transactional;
 import poc.genericresourcemanagement.application.error.FailToChangeResourceRequestStatusException;
 import poc.genericresourcemanagement.application.model.CreateResourceRequest;
+import poc.genericresourcemanagement.application.model.Pageable;
+import poc.genericresourcemanagement.application.model.Query;
 import poc.genericresourcemanagement.application.model.RequestOperation;
 import poc.genericresourcemanagement.application.service.common.TimeGenerator;
 import poc.genericresourcemanagement.domain.model.ResourceRequestDomainModel;
 import poc.genericresourcemanagement.domain.model.ResourceType;
 import poc.genericresourcemanagement.infrastructure.persistence.model.ResourceRequestPersistenceEntity;
 import poc.genericresourcemanagement.infrastructure.persistence.repository.ResourceRequestRepository;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
@@ -28,12 +29,16 @@ public class ResourceRequestService {
     private final ResourceRequestCreationValidationService resourceRequestCreationValidationService;
     private final ResourceRequestValidationService resourceRequestValidationService;
     private final ResourceCreationService resourceCreationService;
+    private final QueryService queryService;
 
-    public Flux<ResourceRequestDomainModel> findResourceRequestDomainModelsByType(
-            final ResourceType type
+    public Mono<Pageable<ResourceRequestDomainModel>> findResourceRequestDomainModelsByType(
+            final Query query
     ) {
-        return resourceRequestRepository.findAllByType(type)
-                .map(this::convert2ResourceRequestDomainModel);
+        return queryService.query(
+                ResourceRequestPersistenceEntity.class,
+                query,
+                entity -> this.convert2ResourceRequestDomainModel((ResourceRequestPersistenceEntity) entity)
+        );
     }
 
     public Mono<ResourceRequestDomainModel> findResourceRequestDomainModelById(

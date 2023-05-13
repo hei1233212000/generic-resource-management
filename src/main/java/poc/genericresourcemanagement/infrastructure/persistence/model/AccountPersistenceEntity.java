@@ -20,11 +20,17 @@ import java.util.UUID;
 @ToString(callSuper = true)
 public class AccountPersistenceEntity extends AbstractPersistenceEntity {
     @Id
+    @SearchableField
+    @SortableField
     private UUID id;
 
     @Column
+    @SearchableField
+    @SortableField
     private String holder;
 
     @Column
+    @SearchableField
+    @SortableField
     private BigDecimal amount;
 }
