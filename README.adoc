@@ -1,0 +1,1 @@
+https://github.com/hei1233212000/generic-resource-management/actions/workflows/ci.yml[image:https://github.com/hei1233212000/generic-resource-management/actions/workflows/ci.yml/badge.svg[CI]]
